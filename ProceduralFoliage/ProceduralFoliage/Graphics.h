@@ -4,6 +4,7 @@
 
 #include <windows.h>
 
+#include "Direct3D.h"
 //global values
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -21,7 +22,7 @@ public:
 
 private:
 	bool Render();
-
+	Direct3D* m_Direct3D;
 };
 
 #endif
