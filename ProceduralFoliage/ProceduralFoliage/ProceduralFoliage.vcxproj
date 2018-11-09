@@ -139,17 +139,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DefaultShader.cpp" />
+    <ClCompile Include="DiffuseLight.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="DefaultShader.h" />
+    <ClInclude Include="DiffuseLight.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="System.h" />
+    <ClInclude Include="Texture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Engine\Shaders\Light.ps" />
+    <None Include="..\Engine\Shaders\Light.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Engine\Textures\Green.tga" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Engine\Models\Cube.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

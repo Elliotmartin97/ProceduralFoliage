@@ -5,6 +5,11 @@
 #include <windows.h>
 
 #include "Direct3D.h"
+#include "Camera.h"
+#include "Model.h"
+#include "Input.h"
+#include "DefaultShader.h"
+#include "DiffuseLight.h"
 //global values
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -19,10 +24,14 @@ public:
 
 	bool Init(int screen_width, int screen_height, HWND hwnd);
 	bool Frame();
-
-private:
 	bool Render();
+private:
+
 	Direct3D* m_Direct3D;
+	Camera* m_camera;
+	Model* m_model;
+	DefaultShader* m_default_shader;
+	DiffuseLight* m_Light;
 };
 
 #endif
