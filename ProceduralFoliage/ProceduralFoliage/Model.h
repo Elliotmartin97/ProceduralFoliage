@@ -10,12 +10,13 @@ struct ModelType
 #ifndef _MODELCLASS_H_
 #define _MODELCLASS_H_
 
+#include "GameObject.h"
 #include <d3d11.h>
 #include <directxmath.h>
 #include "Texture.h"
 #include <fstream>
-using namespace std;
 
+using namespace std;
 using namespace DirectX;
 
 enum FaceDirection {
@@ -27,7 +28,7 @@ enum FaceDirection {
 	FACE_BACK
 };
 
-class Model 
+class Model : public GameObject
 {
 private:
 	struct VertexType
@@ -45,6 +46,7 @@ public:
 	bool Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* model_filename, char* texture_filename);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
+	void SetVertexData(int direction, float amount);
 
 	float GetBlendAmount();
 	void SetBlendAmount(float amount);

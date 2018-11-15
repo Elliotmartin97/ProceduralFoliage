@@ -23,9 +23,8 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.5f, -0.5f, 1.0f);
 
-	m_model = new Model;
-	m_model->Init(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/Green.tga");
-
+	foliage = new Bush;
+	foliage->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext());
 
 	return true;
 }
@@ -39,23 +38,49 @@ bool Graphics::Frame()
 bool Graphics::Render()
 {
 	XMMATRIX world_matrix, view_matrix, projection_matrix;
-	bool result;
-	// Clear the buffers to begin the scene.
+
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Generate the view matrix based on the camera's position.
 	m_camera->Render();
 
-	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Direct3D->GetWorldMatrix(world_matrix);
 	m_camera->GetViewMatrix(view_matrix);
 	m_Direct3D->GetProjectionMatrix(projection_matrix);
+	static float ang = 0;
+	ang += 0.01f;
+	if (ang > 360)
+	{
+		ang = 0;
+	}
 
-	//render the model
-	m_model->Render(m_Direct3D->GetDeviceContext());
+	XMMATRIX cam_rot;
+	XMMATRIX cam_trans;
+	cam_rot = XMMatrixRotationY(ang);
+	cam_trans = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	
 
-	m_default_shader->Render(m_Direct3D->GetDeviceContext(), m_model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
-		m_model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), m_model->GetBlendAmount());
+
+	XMMATRIX move_mat, rot_mat, scale_mat;
+
+	for (int i = 0; i < foliage->GetModelList().size(); i++)
+	{
+		Model* model = foliage->GetModelList()[i];
+
+		rot_mat = XMMatrixRotationRollPitchYaw(model->GetRotation().x, model->GetRotation().y, model->GetRotation().z);
+		move_mat = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
+		scale_mat = XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z);
+
+		world_matrix = scale_mat * rot_mat * move_mat;
+
+		model->Render(m_Direct3D->GetDeviceContext());
+
+		world_matrix = scale_mat * rot_mat * move_mat * cam_trans * cam_rot;
+
+		m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
+			model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
+
+		m_Direct3D->GetWorldMatrix(world_matrix);
+	}
 	m_Direct3D->EndScene();
 
 	return true;

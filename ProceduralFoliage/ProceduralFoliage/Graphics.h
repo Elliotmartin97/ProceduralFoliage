@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "DefaultShader.h"
 #include "DiffuseLight.h"
+#include "Bush.h"
 //global values
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -29,7 +30,7 @@ private:
 
 	Direct3D* m_Direct3D;
 	Camera* m_camera;
-	Model* m_model;
+	FoliageBase* foliage;
 	DefaultShader* m_default_shader;
 	DiffuseLight* m_Light;
 };

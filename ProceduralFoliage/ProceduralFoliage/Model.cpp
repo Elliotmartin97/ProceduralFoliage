@@ -336,3 +336,52 @@ void Model::SetBlendAmount(float amount)
 {
 	blend_amount = amount;
 }
+
+void Model::SetVertexData(int direction, float amount)
+{
+	ShutdownBuffers();
+
+	for (int i = 0; i < 36; i++)
+	{
+		switch (direction)
+		{
+		case FACE_LEFT:
+			if (m_model[i].x == -1.0f)
+			{
+				m_model[i].x = -amount;
+			}
+			break;
+		case FACE_RIGHT:
+			if (m_model[i].x == 1.0f)
+			{
+				m_model[i].x = amount;
+			}
+			break;
+		case FACE_TOP:
+			if (m_model[i].y == 1.0f)
+			{
+				m_model[i].y = amount;
+			}
+			break;
+		case FACE_BOTTOM:
+			if (m_model[i].y == -1.0f)
+			{
+				m_model[i].y = -amount;
+			}
+			break;
+		case FACE_FORWARD:
+			if (m_model[i].z == 1.0f)
+			{
+				m_model[i].z = amount;
+			}
+			break;
+		case FACE_BACK:
+			if (m_model[i].z == -1.0f)
+			{
+				m_model[i].z = -amount;
+			}
+			break;
+		}
+	}
+	InitializeBuffers(m_device);
+}
