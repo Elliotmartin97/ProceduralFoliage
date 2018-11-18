@@ -15,12 +15,13 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 	L_system = new LSystem;
 	L_system->GenerateSystem();
 
-	std::string test = "+[+FX[+F[";
+	std::string test = "+[+LFXYF[]+LFXXZF[";
 
-	float rot_x = 0, rot_y = 0, rot_z = 0;
-	float pos_x = 0, pos_y = 0, pos_z = 0;
-	float sca_x = 0.1, sca_y = 1, sca_z = 0.1;
-
+	XMFLOAT3 pos = { 0, 0, 0 };
+	XMFLOAT4 rot = { 0, 0, 0, 1 };
+	XMFLOAT3 scale = { 0.1, 1, 0.1 };
+	int model_count = -1;
+	int selected = -1;
 	for (int iter = 0; iter < 1; iter++)
 	{
 		for (int i = 0; i < test.size(); i++)
@@ -37,37 +38,42 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 				
 				break;
 			case 'X':
-				rot_x += 20;
+				rot.x += 20;
 				break;
 			case 'Y':
-				rot_y += 20;
+				rot.y += 20;
 				break;
 			case 'Z':
-				rot_z += 20;
+				rot.z += 20;
 				break;
 			case 'F':
-				pos_y += 1;
-				current_model->SetVertexData(FACE_TOP, 1);
-				current_model->SetVertexData(FACE_BOTTOM, 0);
+				current_model->MoveUP(1);
+				XMStoreFloat3(&pos,current_model->GetPosition());
 				break;
 			case '[':
 				model_list.push_back(current_model);
+				model_count++;
+				selected++;
 				break;
 			case ']':
-				//pop
+				selected--;
+				current_model = model_list[selected];
+				XMStoreFloat3(&pos, current_model->GetPosition());
+				XMStoreFloat4(&rot, current_model->GetRotation());
+				XMStoreFloat3(&scale, current_model->GetScale());
 				break;
 			case 'R':
 				//scale radius down
 				break;
 			case 'L':
-				//scale length down
+				scale.y -= 0.25f;
 				break;
 			}
 			if (current_model)
 			{
-				current_model->SetRotation(rot_x, rot_y, rot_z);
-				current_model->SetPosition(pos_x, pos_y, pos_z);
-				current_model->SetScale(sca_x, sca_y, sca_z);
+				current_model->SetPosition(pos.x, pos.y, pos.z);
+				current_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
+				current_model->SetScale(scale.x, scale.y, scale.z);
 			}
 		}
 	}

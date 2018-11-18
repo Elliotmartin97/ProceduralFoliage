@@ -66,15 +66,9 @@ bool Graphics::Render()
 	{
 		Model* model = foliage->GetModelList()[i];
 
-		rot_mat = XMMatrixRotationRollPitchYaw(model->GetRotation().x, model->GetRotation().y, model->GetRotation().z);
-		move_mat = XMMatrixTranslation(model->GetPosition().x, model->GetPosition().y, model->GetPosition().z);
-		scale_mat = XMMatrixScaling(model->GetScale().x, model->GetScale().y, model->GetScale().z);
-
-		world_matrix = scale_mat * rot_mat * move_mat;
-
 		model->Render(m_Direct3D->GetDeviceContext());
 
-		world_matrix = scale_mat * rot_mat * move_mat * cam_trans * cam_rot;
+		world_matrix = model->GetTransform() * cam_trans * cam_rot;
 
 		m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
 			model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());

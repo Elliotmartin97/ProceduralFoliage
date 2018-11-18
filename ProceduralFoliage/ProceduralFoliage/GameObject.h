@@ -10,18 +10,23 @@ public:
 	GameObject();
 	~GameObject();
 
-	void SetPosition(float, float, float);
-	XMFLOAT3 GetPosition();
+	void MoveUP(float unit);
 
-	void SetRotation(float, float, float);
-	XMFLOAT4 GetRotation();
+	void SetPosition(float, float, float);
+	XMVECTOR GetPosition();
+
+	void SetRotation(float, float, float, float);
+	XMVECTOR GetRotation();
 
 	void SetScale(float, float, float);
-	XMFLOAT3 GetScale();
+	XMVECTOR GetScale();
 
+	void UpdateTransform();
+	XMMATRIX GetTransform();
+	void SetTransform(XMMATRIX new_transform);
 private:
 	XMMATRIX transform;
-	XMFLOAT3 position;
-	XMFLOAT4 rotation;
-	XMFLOAT3 scale;
+	XMVECTOR position;
+	XMVECTOR rotation;
+	XMVECTOR scale;
 };
