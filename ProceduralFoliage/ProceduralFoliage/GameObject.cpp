@@ -63,9 +63,9 @@ XMVECTOR GameObject::GetScale()
 
 void GameObject::UpdateTransform()
 {
-	XMVECTOR rot_norm = XMVector4Normalize(rotation);
+	//XMVECTOR rot_norm = XMVector4Normalize(rotation);
 
-	XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(rot_norm);
+	XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(rotation);
 	XMMATRIX pos = XMMatrixTranslationFromVector(position);
 	XMMATRIX sca = XMMatrixScalingFromVector(scale);
 

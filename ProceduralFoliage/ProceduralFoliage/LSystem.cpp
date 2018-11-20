@@ -4,20 +4,24 @@
 LSystem::LSystem()
 {
 	rules.resize(4);
-	rules[0].a = '+';
-	rules[0].b = "+]LRFXYZF[+]LRFXYZF[";
+	rules[0].a = 'A';
+	rules[0].b = "+LRFXYZF[]BC";
 
 	rules[1].a = 'B';
-	rules[1].b = "A";
+	rules[1].b = "+LRFXYZF[BC]+LRFXYZF[BC";
 
-	axiom = '+';
-	iterations = 3;
+	rules[2].a = 'C';
+	rules[2].b = "@";
+
+	axiom = "+[AAA";
+	iterations = 10;
 }
 
 void LSystem::GenerateSystem()
 {
 	std::ofstream file;
 	file.open("../Engine/LSystems/data.txt");
+	file.clear();
 	std::string next_sentence = axiom;
 
 	for (int i = 0; i < iterations; i++)
@@ -26,6 +30,7 @@ void LSystem::GenerateSystem()
 		file << next_sentence << std::endl;
 		std::string current_sentence = next_sentence;
 		next_sentence.clear();
+		next_sentence = "#";
 		for (int j = 0; j < current_sentence.size(); j++)
 		{
 			bool found = false;
@@ -40,8 +45,10 @@ void LSystem::GenerateSystem()
 			}
 			if (!found)
 			{
-				next_sentence += current_sentence[j];
+				next_sentence += "";//current_sentence[j];
 			}
 		}
 	}
+
+	file.close();
 }

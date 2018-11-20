@@ -9,8 +9,8 @@ public:
 	 ~FoliageBase() = default;
 
 	 virtual void Generate(ID3D11Device* device, ID3D11DeviceContext* device_context) = 0;
-	 std::vector<Model*> GetModelList() { return model_list; };
+	 std::vector<Model*> GetModelList() { return render_list; };
 protected:
-	std::vector<Model*> model_list;
+	std::vector<Model*> render_list;
 	LSystem* L_system;
 };
