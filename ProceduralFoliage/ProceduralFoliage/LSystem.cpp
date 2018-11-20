@@ -4,14 +4,14 @@
 LSystem::LSystem()
 {
 	rules.resize(4);
-	rules[0].a = 'A';
-	rules[0].b = "AB";
+	rules[0].a = '+';
+	rules[0].b = "+]LRFXYZF[+]LRFXYZF[";
 
 	rules[1].a = 'B';
 	rules[1].b = "A";
 
-	axiom = 'A';
-	iterations = 10;
+	axiom = '+';
+	iterations = 3;
 }
 
 void LSystem::GenerateSystem()

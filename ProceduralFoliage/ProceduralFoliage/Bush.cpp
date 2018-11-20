@@ -16,7 +16,8 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 	L_system = new LSystem;
 	L_system->GenerateSystem();
 	float r;
-	std::string test = "+]LRFXF[+LRFXYF[+]LRFXYZF[+]]LRFYZF[";
+	//std::string test = "+]LRFXYZF[+]LRFXYZF[";
+	std::string test = L_system->GetData(1);
 
 	XMFLOAT3 pos = { 0, 0, 0 };
 	XMFLOAT4 rot = { 0, 0, 0, 1 };
@@ -34,8 +35,9 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 		current_model->SetScale(scale.x, scale.y, scale.z);
 	}
 
-	for (int iter = 0; iter < 1; iter++)
+	for (int iter = 0; iter < L_system->GetIterations(); iter++)
 	{
+		std::string test = L_system->GetData(iter);
 		for (int i = 0; i < test.size(); i++)
 		{
 			switch (test[i])
@@ -47,15 +49,15 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 			}
 				break;
 			case 'X':
-				r = rand() % 360 + 10;
+				r = rand() % 360;
 				rot.x += r;
 				break;
 			case 'Y':
-				r = rand() % 360 + 10;
+				r = rand() % 360;
 				rot.y += r;
 				break;
 			case 'Z':
-				r = rand() % 360 + 10;
+				r = rand() % 360;
 				rot.z += r;
 				break;
 			case 'F':
