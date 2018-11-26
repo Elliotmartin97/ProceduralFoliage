@@ -41,16 +41,16 @@ void Bush::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context)
 			}
 				break;
 			case 'X':
-				r = rand() % 45;
-				rot.x += r * 3.141592654f / 360.0f;
+				r = (float)rand() / ((float)RAND_MAX/ 2.0f ) - 1.0f;
+				rot.x += r;
 				break;
 			case 'Y':
-				r = rand() % 90;
-				//rot.y += r * 3.141592654f / 360.0f;
+				r = (float)rand() / ((float)RAND_MAX / 2.0f) - 1.0f;
+				rot.y += r;
 				break;
 			case 'Z':
-				r = rand() % 45;
-				rot.z += r * 3.141592654f / 360.0f;
+				r = (float)rand() / ((float)RAND_MAX / 2.0f) - 1.0f;
+				rot.z += r;
 				break;
 			case 'F':
 				current_model->MoveUP(1);

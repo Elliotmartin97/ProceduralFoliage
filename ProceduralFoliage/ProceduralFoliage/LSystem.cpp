@@ -13,7 +13,7 @@ LSystem::LSystem()
 	rules[2].a = 'C';
 	rules[2].b = "@";
 
-	axiom = "+[AAA";
+	axiom = "+[AAAA";
 	iterations = 10;
 }
 
@@ -45,7 +45,7 @@ void LSystem::GenerateSystem()
 			}
 			if (!found)
 			{
-				next_sentence += "";//current_sentence[j];
+				next_sentence += "";
 			}
 		}
 	}
