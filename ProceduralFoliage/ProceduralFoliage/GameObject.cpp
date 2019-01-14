@@ -17,10 +17,50 @@ GameObject::~GameObject()
 {
 }
 
-void GameObject::MoveUP(float unit)
+void GameObject::MoveUp(float unit)
 {
 	XMVECTOR forward = transform.r[1];
 	position = position + forward * unit;
+
+	UpdateTransform();
+}
+
+void GameObject::MoveDown(float unit)
+{
+	XMVECTOR forward = transform.r[1];
+	position = position - forward * unit;
+
+	UpdateTransform();
+}
+
+void GameObject::MoveRight(float unit)
+{
+	XMVECTOR forward = transform.r[0];
+	position = position + forward * unit;
+
+	UpdateTransform();
+}
+
+void GameObject::MoveLeft(float unit)
+{
+	XMVECTOR forward = transform.r[0];
+	position = position - forward * unit;
+
+	UpdateTransform();
+}
+
+void GameObject::MoveForward(float unit)
+{
+	XMVECTOR forward = transform.r[2];
+	position = position + forward * unit;
+
+	UpdateTransform();
+}
+
+void GameObject::MoveBackward(float unit)
+{
+	XMVECTOR forward = transform.r[2];
+	position = position - forward * unit;
 
 	UpdateTransform();
 }

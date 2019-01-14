@@ -23,8 +23,8 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.5f, -0.5f, 1.0f);
 
-	foliage = new Bush;
-	foliage->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext());
+	turtle = new Turtle;
+	turtle->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext(), "fern");
 
 	return true;
 }
@@ -62,9 +62,9 @@ bool Graphics::Render()
 
 	XMMATRIX move_mat, rot_mat, scale_mat;
 
-	for (int i = 0; i < foliage->GetModelList().size(); i++)
+	for (int i = 0; i < turtle->GetModelList().size(); i++)
 	{
-		Model* model = foliage->GetModelList()[i];
+		Model* model = turtle->GetModelList()[i];
 
 		model->Render(m_Direct3D->GetDeviceContext());
 

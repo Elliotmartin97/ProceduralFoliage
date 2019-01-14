@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bush.cpp" />
+    <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DefaultShader.cpp" />
     <ClCompile Include="DiffuseLight.cpp" />
@@ -154,12 +154,11 @@
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bush.h" />
+    <ClInclude Include="Turtle.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DefaultShader.h" />
     <ClInclude Include="DiffuseLight.h" />
     <ClInclude Include="Direct3D.h" />
-    <ClInclude Include="FoliageBase.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Input.h" />
@@ -177,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Engine\Models\Cube.txt" />
+    <Text Include="..\Engine\Models\Quad.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

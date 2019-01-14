@@ -57,13 +57,13 @@
     <ClCompile Include="DiffuseLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bush.cpp">
-      <Filter>Resource Files\FoliageTypes</Filter>
-    </ClCompile>
     <ClCompile Include="LSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Turtle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -95,16 +95,13 @@
     <ClInclude Include="DiffuseLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bush.h">
-      <Filter>Resource Files\FoliageTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="FoliageBase.h">
-      <Filter>Resource Files\FoliageTypes</Filter>
-    </ClInclude>
     <ClInclude Include="LSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Turtle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -123,6 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Engine\Models\Cube.txt">
+      <Filter>Resource Files\Models</Filter>
+    </Text>
+    <Text Include="..\Engine\Models\Quad.txt">
       <Filter>Resource Files\Models</Filter>
     </Text>
   </ItemGroup>

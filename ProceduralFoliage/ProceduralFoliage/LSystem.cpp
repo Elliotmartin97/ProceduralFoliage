@@ -3,18 +3,54 @@
 
 LSystem::LSystem()
 {
-	rules.resize(4);
+	//default
+	rules.resize(3);
 	rules[0].a = 'A';
-	rules[0].b = "+LRFXYZF[]BC";
+	rules[0].b = "+LRFXYZF[^]BC";
 
 	rules[1].a = 'B';
-	rules[1].b = "+LRFXYZF[BC]+LRFXYZF[BC";
+	rules[1].b = "+LRFXYZF[^BC]+LRFXYZF[^BC";
 
 	rules[2].a = 'C';
 	rules[2].b = "@";
 
-	axiom = "+[AAAA";
-	iterations = 10;
+	axiom = "+[AAAAAAA";
+	iterations = 6;
+}
+
+LSystem::LSystem(std::string file_name)
+{
+	std::ifstream file;
+	file.open("../Engine/Lsystems/Types/" + file_name + ".txt");
+	file >> rule_size;
+	file >> iterations;
+	file >> starting_branches;
+	file >> fixed_branches;
+	file >> axiom;
+	for (int i = 0; i < starting_branches; i++)
+	{
+		axiom += "A";
+	}
+	
+	rules.resize(rule_size);
+	for (int i = 0; i < rule_size; i++)
+	{
+		file >> rules[i].a;
+		file >> rules[i].b;
+	}
+
+	file >> split_count;
+	for (int i = 0; i < split_count; i++)
+	{
+		rules[1].b += "]+LRFXYZF[^BC";
+	}
+
+	file >> start_scale.x >> start_scale.y >> start_scale.z;
+	file >> scale_decrease.x >> scale_decrease.y >> scale_decrease.z;
+	file >> rotation_range.x >> rotation_range.y >> rotation_range.z;
+	file >> branch_rotation.x >> branch_rotation.y >> branch_rotation.z;
+	file >> curve;
+	file.close();
 }
 
 void LSystem::GenerateSystem()
@@ -51,4 +87,13 @@ void LSystem::GenerateSystem()
 	}
 
 	file.close();
+}
+
+bool LSystem::IsFixed()
+{
+	if (fixed_branches == 1)
+	{
+		return true;
+	}
+	return false;
 }

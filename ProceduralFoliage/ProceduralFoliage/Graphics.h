@@ -10,7 +10,8 @@
 #include "Input.h"
 #include "DefaultShader.h"
 #include "DiffuseLight.h"
-#include "Bush.h"
+#include "Turtle.h"
+
 //global values
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -30,7 +31,7 @@ private:
 
 	Direct3D* m_Direct3D;
 	Camera* m_camera;
-	FoliageBase* foliage;
+	Turtle* turtle;
 	DefaultShader* m_default_shader;
 	DiffuseLight* m_Light;
 };

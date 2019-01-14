@@ -10,7 +10,12 @@ public:
 	GameObject();
 	~GameObject();
 
-	void MoveUP(float unit);
+	void MoveUp(float unit);
+	void MoveDown(float unit);
+	void MoveRight(float unit);
+	void MoveLeft(float unit);
+	void MoveForward(float unit);
+	void MoveBackward(float unit);
 
 	void SetPosition(float, float, float);
 	XMVECTOR GetPosition();
