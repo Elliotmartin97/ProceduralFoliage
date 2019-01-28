@@ -1,5 +1,24 @@
 #include "Graphics.h"
 
+void TW_CALL CopyStdStringToClient(std::string& destinationClientString, const std::string& sourceLibraryString)
+{
+	destinationClientString = sourceLibraryString;
+}
+
+void TW_CALL LoadCB(void* client_data)
+{
+	Graphics* graphics = static_cast<Graphics*>(client_data);
+
+	graphics->LoadTypeFile(graphics->GetFileName());
+}
+
+void TW_CALL ReloadCB(void* client_data)
+{
+	Graphics* graphics = static_cast<Graphics*>(client_data);
+
+	graphics->Refresh();
+}
+
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
 	bool result;
@@ -11,7 +30,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
 	//Initialize the Camera object.
 	m_camera = new Camera;
-	m_camera->SetPosition(0.0f, 2.0f, -10.0f);
+	m_camera->SetPosition(0.0f, 3.0f, -10.0f);
 
 	//Initialize the Shaders
 	m_default_shader = new DefaultShader;
@@ -23,10 +42,42 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.5f, -0.5f, 1.0f);
 
+	TwInit(TW_DIRECT3D11, m_Direct3D->GetDevice());
+	TwWindowSize(screen_width, screen_height);
+
+	loader_bar = TwNewBar("Load File");
+
+	TwCopyStdStringToClientFunc(CopyStdStringToClient);
+	TwAddVarRW(loader_bar, "File Name", TW_TYPE_STDSTRING, &load_file_name, "");
+	TwAddButton(loader_bar, "LOAD", LoadCB, this, " label='LOAD TYPE ");
+	TwAddButton(loader_bar, "REFRESH", ReloadCB, this, " label='REFRESH MODEL ");
+
 	turtle = new Turtle;
 	turtle->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext(), "fern");
 
 	return true;
+}
+
+void Graphics::LoadTypeFile(std::string file_name)
+{
+	if (turtle)
+	{
+		delete turtle;
+		turtle = nullptr;
+	}
+
+	turtle = new Turtle;
+	turtle->Generate(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), file_name);
+}
+
+void Graphics::Refresh()
+{
+	if (turtle)
+	{
+		LSystem* LS = turtle->GetLSystem();
+		LS->SaveType("temp");
+		LoadTypeFile("temp");
+	}
 }
 
 bool Graphics::Frame()
@@ -75,6 +126,7 @@ bool Graphics::Render()
 
 		m_Direct3D->GetWorldMatrix(world_matrix);
 	}
+	TwDraw();
 	m_Direct3D->EndScene();
 
 	return true;

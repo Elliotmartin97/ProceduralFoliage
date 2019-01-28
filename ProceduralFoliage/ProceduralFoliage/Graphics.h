@@ -10,7 +10,9 @@
 #include "Input.h"
 #include "DefaultShader.h"
 #include "DiffuseLight.h"
+#include "AntTweakBar.h"
 #include "Turtle.h"
+#include "LSystem.h"
 
 //global values
 const bool FULL_SCREEN = false;
@@ -24,7 +26,11 @@ public:
 	Graphics() = default;
 	~Graphics() = default;
 
+
+	std::string GetFileName() { return load_file_name; };
 	bool Init(int screen_width, int screen_height, HWND hwnd);
+	void LoadTypeFile(std::string file_name);
+	void Refresh();
 	bool Frame();
 	bool Render();
 private:
@@ -34,6 +40,8 @@ private:
 	Turtle* turtle;
 	DefaultShader* m_default_shader;
 	DiffuseLight* m_Light;
+	TwBar* loader_bar;
+	std::string load_file_name;
 };
 
 #endif

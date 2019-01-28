@@ -104,6 +104,9 @@
     <ClInclude Include="Turtle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AntTweakBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\Shaders\Light.ps">

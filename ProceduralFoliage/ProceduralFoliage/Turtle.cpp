@@ -7,7 +7,13 @@ Turtle::Turtle()
 
 Turtle::~Turtle()
 {
+	delete L_system;
+	L_system = nullptr;
 
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		render_list[i]->Shutdown();
+	}
 }
 
 void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context, std::string name)
@@ -18,9 +24,10 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 
 	XMFLOAT3 pos = { 0.0f, 0.0f, 0.0f };
 	XMFLOAT4 rot = { 0.0f, 0.0f, 0.0f, 1.0f };
-	XMFLOAT3 scale = L_system->GetStartScale();
+	XMFLOAT3 scale =  L_system->GetStartScale();
 	XMFLOAT3 rotation_range = L_system->GetRange();
 	XMFLOAT3 branch_rotation = L_system->GetBranchRot();
+	XMFLOAT2 leaf_multi = L_system->GetLeafScale();
 
 	Model* previous_model = nullptr;
 	std::vector<Model*> previous_list;
@@ -32,6 +39,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 	float range = 0.0f;
 	int selected = 0;
 	int counter = 0;
+	bool do_once = true;
 
 	for (int iter = 0; iter < L_system->GetIterations(); iter++)
 	{
@@ -44,7 +52,10 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 			case '+':
 			{
 				//flip the x to get branches on either side of foliage
-				branch_rotation.x = -branch_rotation.x;
+				if (fixed_branches)
+				{
+					branch_rotation.x = -branch_rotation.x;
+				}
 				current_model = new Model;
 				current_model->Init(device, device_context, (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/Green.tga");
 				counter++;
@@ -117,7 +128,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				}
 				break;
 			case 'F':
-				current_model->MoveUp(1);
+				current_model->MoveUp(1.1f);
 				XMStoreFloat3(&pos,current_model->GetPosition());
 				break;
 			case '[':
@@ -139,6 +150,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				XMStoreFloat3(&pos, previous_model->GetPosition());
 				XMStoreFloat4(&rot, previous_model->GetRotation());
 				XMStoreFloat3(&scale, previous_model->GetScale());
+				
 				break;
 			case '#':
 				selected = 0;
@@ -161,12 +173,15 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				scale.y *= 1.25f;
 				break;
 			case '^':
-				Model* leave_model = new Model;
-				leave_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Green.tga");
-				leave_model->SetPosition(pos.x, pos.y, pos.z);
-				leave_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
-				leave_model->SetScale(scale.y, scale.y, 1.0f);
-				leaves_list.push_back(leave_model);
+				if (L_system->ShowLeaves())
+				{
+					Model* leave_model = new Model;
+					leave_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Green.tga");
+					leave_model->SetPosition(pos.x, pos.y, pos.z);
+					leave_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
+					leave_model->SetScale(scale.y * leaf_multi.x, scale.y * leaf_multi.y, 1.0f);
+					leaves_list.push_back(leave_model);
+				}
 				break;
 			}
 
@@ -176,6 +191,8 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				current_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
 				current_model->SetScale(scale.x, scale.y, scale.z);
 			}
+
+			
 		}
 		previous_list = current_list;
 		render_list.insert(render_list.end(), current_list.begin(), current_list.end());
@@ -185,4 +202,9 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 	}
 	previous_list.clear();
 	int z = counter;
+	if (L_system->ShowAxiom() != true)
+	{
+		render_list[0]->Shutdown();
+		render_list.erase(render_list.begin());
+	}
 }

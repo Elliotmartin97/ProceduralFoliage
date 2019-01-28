@@ -73,6 +73,11 @@ bool System::Frame()
 
 LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
+	if (TwEventWin(hwnd, umsg, wparam, lparam))
+	{
+		return 0; // Event has been handled by AntTweakBar
+	}
+
 	switch (umsg)
 	{
 		case WM_KEYDOWN:
@@ -148,8 +153,8 @@ void System::InitializeWindows(int& screenHeight, int& screenWidth)
 	else
 	{
 		// If windowed then set it to 800x600 resolution.
-		screenWidth = 800;
-		screenHeight = 600;
+		screenWidth = 1280;
+		screenHeight = 960;
 
 		// Place the window in the middle of the screen.
 		posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
