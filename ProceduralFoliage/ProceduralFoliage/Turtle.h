@@ -11,6 +11,7 @@ public:
 
 	void Generate(ID3D11Device* device, ID3D11DeviceContext* device_context, std::string name);
 	LSystem* GetLSystem() { return L_system; };
+	std::string GetName() { return L_system->GetName(); };
 	std::vector<Model*> GetModelList() { return render_list; };
 private:
 	std::vector<Model*> render_list;

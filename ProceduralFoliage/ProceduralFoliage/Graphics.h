@@ -13,6 +13,7 @@
 #include "AntTweakBar.h"
 #include "Turtle.h"
 #include "LSystem.h"
+#include "ModelExporter.h"
 
 //global values
 const bool FULL_SCREEN = false;
@@ -31,6 +32,7 @@ public:
 	bool Init(int screen_width, int screen_height, HWND hwnd);
 	void LoadTypeFile(std::string file_name);
 	void Refresh();
+	void ExportModel();
 	bool Frame();
 	bool Render();
 private:
@@ -42,6 +44,8 @@ private:
 	DiffuseLight* m_Light;
 	TwBar* loader_bar;
 	std::string load_file_name;
+	ModelExporter* exporter;
+	XMMATRIX world_matrix, view_matrix, projection_matrix;
 };
 
 #endif

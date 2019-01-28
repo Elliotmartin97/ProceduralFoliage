@@ -19,15 +19,6 @@ struct ModelType
 using namespace std;
 using namespace DirectX;
 
-enum FaceDirection {
-	FACE_LEFT,
-	FACE_RIGHT,
-	FACE_TOP,
-	FACE_BOTTOM,
-	FACE_FORWARD,
-	FACE_BACK
-};
-
 class Model : public GameObject
 {
 private:
@@ -46,7 +37,6 @@ public:
 	bool Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* model_filename, char* texture_filename);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
-	void SetVertexData(int direction, float amount);
 
 	float GetBlendAmount();
 	void SetBlendAmount(float amount);

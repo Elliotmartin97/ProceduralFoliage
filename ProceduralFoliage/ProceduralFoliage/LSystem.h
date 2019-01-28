@@ -17,6 +17,7 @@ public:
 	LSystem(std::string file_name);
 	~LSystem();
 
+	std::string GetName() { return type_name; };
 	void GenerateSystem();
 	void SaveType(std::string name);
 	std::string GetData(int index) { return data[index]; };

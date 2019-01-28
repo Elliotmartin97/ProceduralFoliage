@@ -30,6 +30,7 @@ public:
 	XMMATRIX GetTransform();
 	void SetTransform(XMMATRIX new_transform);
 private:
+	XMMATRIX identity_matrix;
 	XMMATRIX transform;
 	XMVECTOR position;
 	XMVECTOR rotation;

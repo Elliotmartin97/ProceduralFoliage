@@ -19,6 +19,13 @@ void TW_CALL ReloadCB(void* client_data)
 	graphics->Refresh();
 }
 
+void TW_CALL ExportCB(void* client_data)
+{
+	Graphics* graphics = static_cast<Graphics*>(client_data);
+
+	graphics->ExportModel();
+}
+
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
 	bool result;
@@ -50,10 +57,17 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	TwCopyStdStringToClientFunc(CopyStdStringToClient);
 	TwAddVarRW(loader_bar, "File Name", TW_TYPE_STDSTRING, &load_file_name, "");
 	TwAddButton(loader_bar, "LOAD", LoadCB, this, " label='LOAD TYPE ");
+	TwAddSeparator(loader_bar, "", NULL);
 	TwAddButton(loader_bar, "REFRESH", ReloadCB, this, " label='REFRESH MODEL ");
+	TwAddSeparator(loader_bar, "", NULL);
+	TwAddButton(loader_bar, "EXPORT", ExportCB, this, " label='EXPORT MODEL ");
+
+
 
 	turtle = new Turtle;
 	turtle->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext(), "fern");
+
+	exporter = new ModelExporter;
 
 	return true;
 }
@@ -80,6 +94,11 @@ void Graphics::Refresh()
 	}
 }
 
+void Graphics::ExportModel()
+{
+	exporter->Export(turtle->GetName(), turtle->GetModelList(), world_matrix);
+}
+
 bool Graphics::Frame()
 {
 	Render();
@@ -88,13 +107,11 @@ bool Graphics::Frame()
 
 bool Graphics::Render()
 {
-	XMMATRIX world_matrix, view_matrix, projection_matrix;
 
 	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 	m_camera->Render();
 
-	m_Direct3D->GetWorldMatrix(world_matrix);
 	m_camera->GetViewMatrix(view_matrix);
 	m_Direct3D->GetProjectionMatrix(projection_matrix);
 	static float ang = 0;

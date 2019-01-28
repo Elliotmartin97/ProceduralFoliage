@@ -6,10 +6,11 @@ GameObject::GameObject()
 	SetRotation(0.0f, 0.0f, 0.0f, 1.0f);
 	SetScale(1.0f, 1.0f, 1.0f);
 
-	transform = { 1.0f, 0.0f, 0.0f, 0.0f,
-				  0.0f, 1.0f, 0.0f, 0.0f,
-				  0.0f, 0.0f, 1.0f, 0.0f,
-				  0.0f, 0.0f, 0.0f, 1.0f };
+	identity_matrix = { 1.0f, 0.0f, 0.0f, 0.0f,
+					    0.0f, 1.0f, 0.0f, 0.0f,
+					    0.0f, 0.0f, 1.0f, 0.0f,
+					    0.0f, 0.0f, 0.0f, 1.0f };
+	transform = identity_matrix;
 	
 }
 

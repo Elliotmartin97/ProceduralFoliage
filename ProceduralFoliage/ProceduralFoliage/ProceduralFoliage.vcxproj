@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ModelExporter.cpp" />
     <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DefaultShader.cpp" />
@@ -157,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AntTweakBar.h" />
+    <ClInclude Include="ModelExporter.h" />
     <ClInclude Include="Turtle.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="DefaultShader.h" />

@@ -75,6 +75,8 @@ LSystem::LSystem(std::string file_name)
 	file >> leaf_scale_multi.x >> leaf_scale_multi.y;
 	file.close();
 
+	//The great anttweakbar wall of text
+
 	const char* bar_name = file_name.c_str();
 	TwCopyStdStringToClientFunc(CopyStdStringToClient2);
 	tweak_bar = TwNewBar(bar_name);
