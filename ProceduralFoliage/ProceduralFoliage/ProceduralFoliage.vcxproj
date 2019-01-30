@@ -175,8 +175,11 @@
   <ItemGroup>
     <None Include="..\Engine\Shaders\Light.ps" />
     <None Include="..\Engine\Shaders\Light.vs" />
+    <None Include="..\Engine\Shaders\PBRLight.ps" />
+    <None Include="..\Engine\Shaders\PBRLight.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\Engine\Textures\Fern.tga" />
     <Image Include="..\Engine\Textures\Green.tga" />
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_VIEWPORT viewport;
+	D3D11_BLEND_DESC blendStateDescription;
 	float fieldOfView, screenAspect;
 
 	m_vsync_enabled = vsync;
@@ -176,21 +177,21 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 
 	// Create the swap chain, Direct3D device, and Direct3D device context.
 	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-			D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+			D3D11_SDK_VERSION, &swapChainDesc, &m_swap_chain, &m_device, NULL, &device_context);
 	if (FAILED(result))
 	{
 		return false;
 	}
 	 
 	// Get the pointer to the back buffer.
-	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	result = m_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Create the render target view with the back buffer pointer.
-	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_render_target_view);
 	if (FAILED(result))
 	{
 		return false;
@@ -217,7 +218,7 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	depthBufferDesc.MiscFlags = 0;
 	
 	// Create the texture for the depth buffer using the filled out description.
-	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
+	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depth_stencil_buffer);
 	if (FAILED(result))
 	{
 		return false;
@@ -248,14 +249,14 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 	
 	// Create the depth stencil state.
-	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState);
+	result = m_device->CreateDepthStencilState(&depthStencilDesc, &m_depth_stencil_state);
 	if (FAILED(result))
 	{
 		return false;
 	}
 	
 	// Set the depth stencil state.
-	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
+	device_context->OMSetDepthStencilState(m_depth_stencil_state, 1);
 
 	// Initialize the depth stencil view.
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
@@ -266,14 +267,14 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view.
-	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
+	result = m_device->CreateDepthStencilView(m_depth_stencil_buffer, &depthStencilViewDesc, &m_depth_stencil_view);
 	if (FAILED(result))
 	{
 		return false;
 	}
 	
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	device_context->OMSetRenderTargets(1, &m_render_target_view, m_depth_stencil_view);
 	
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	rasterDesc.AntialiasedLineEnable = false;
@@ -287,15 +288,40 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
+	ZeroMemory(&blendStateDescription, sizeof(D3D11_BLEND_DESC));
+	//blend state
+	blendStateDescription.RenderTarget[0].BlendEnable = TRUE;
+	blendStateDescription.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDescription.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blendStateDescription.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	blendStateDescription.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blendStateDescription.RenderTarget[0].RenderTargetWriteMask = 0x0f;
+
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaEnableBlendingState);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
+	blendStateDescription.RenderTarget[0].BlendEnable = FALSE;
+
+	result = m_device->CreateBlendState(&blendStateDescription, &m_alphaDisableBlendingState);
+	if (FAILED(result))
+	{
+		return false;
+	}
+
 	// Create the rasterizer state from the description we just filled out.
-	result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	result = m_device->CreateRasterizerState(&rasterDesc, &m_raster_state);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Now set the rasterizer state.
-	m_deviceContext->RSSetState(m_rasterState);
+	device_context->RSSetState(m_raster_state);
 	
 	// Setup the viewport for rendering.
 	viewport.Width = (float)screenWidth;
@@ -306,7 +332,7 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	viewport.TopLeftY = 0.0f;
 
 	// Create the viewport.
-	m_deviceContext->RSSetViewports(1, &viewport);
+	device_context->RSSetViewports(1, &viewport);
 	
 		// Setup the projection matrix.
 		fieldOfView = 3.141592654f / 4.0f;
@@ -323,6 +349,78 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	return true;
 }
 
+void Direct3D::Shutdown()
+{
+	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
+
+	if (m_alphaEnableBlendingState)
+	{
+		m_alphaEnableBlendingState->Release();
+		m_alphaEnableBlendingState = 0;
+	}
+
+	if (m_alphaDisableBlendingState)
+	{
+		m_alphaDisableBlendingState->Release();
+		m_alphaDisableBlendingState = 0;
+	}
+
+	if (m_swap_chain)
+	{
+		m_swap_chain->SetFullscreenState(false, NULL);
+	}
+
+	if (m_raster_state)
+	{
+		m_raster_state->Release();
+		m_raster_state = 0;
+	}
+
+	if (m_depth_stencil_view)
+	{
+		m_depth_stencil_view->Release();
+		m_depth_stencil_view = 0;
+	}
+
+	if (m_depth_stencil_state)
+	{
+		m_depth_stencil_state->Release();
+		m_depth_stencil_state = 0;
+	}
+
+	if (m_depth_stencil_buffer)
+	{
+		m_depth_stencil_buffer->Release();
+		m_depth_stencil_buffer = 0;
+	}
+
+	if (m_render_target_view)
+	{
+		m_render_target_view->Release();
+		m_render_target_view = 0;
+	}
+
+	if (device_context)
+	{
+		device_context->Release();
+		device_context = 0;
+	}
+
+	if (m_device)
+	{
+		m_device->Release();
+		m_device = 0;
+	}
+
+	if (m_swap_chain)
+	{
+		m_swap_chain->Release();
+		m_swap_chain = 0;
+	}
+
+	return;
+}
+
 void Direct3D::BeginScene(float red, float green, float blue, float alpha)
 {
 	float color[4];
@@ -335,10 +433,10 @@ void Direct3D::BeginScene(float red, float green, float blue, float alpha)
 	color[3] = alpha;
 
 	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView, color);
+	device_context->ClearRenderTargetView(m_render_target_view, color);
 
 	// Clear the depth buffer.
-	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	device_context->ClearDepthStencilView(m_depth_stencil_view, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	return;
 }
@@ -349,12 +447,12 @@ void Direct3D::EndScene()
 	if (m_vsync_enabled)
 	{
 		// Lock to screen refresh rate.
-		m_swapChain->Present(1, 0);
+		m_swap_chain->Present(1, 0);
 	}
 	else
 	{
 		// Present as fast as possible.
-		m_swapChain->Present(0, 0);
+		m_swap_chain->Present(0, 0);
 	}
 
 	return;
@@ -367,7 +465,7 @@ ID3D11Device* Direct3D::GetDevice()
 
 ID3D11DeviceContext* Direct3D::GetDeviceContext()
 {
-	return m_deviceContext;
+	return device_context;
 }
 
 void Direct3D::GetProjectionMatrix(XMMATRIX& projectionMatrix)
@@ -394,5 +492,39 @@ void Direct3D::GetVideoCardInfo(char* cardName, int& memory)
 {
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;
+	return;
+}
+
+void Direct3D::TurnOnAlphaBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn on the alpha blending.
+	device_context->OMSetBlendState(m_alphaEnableBlendingState, blendFactor, 0xffffffff);
+
+	return;
+}
+
+void Direct3D::TurnOffAlphaBlending()
+{
+	float blendFactor[4];
+
+
+	// Setup the blend factor.
+	blendFactor[0] = 0.0f;
+	blendFactor[1] = 0.0f;
+	blendFactor[2] = 0.0f;
+	blendFactor[3] = 0.0f;
+
+	// Turn off the alpha blending.
+	device_context->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
+
 	return;
 }

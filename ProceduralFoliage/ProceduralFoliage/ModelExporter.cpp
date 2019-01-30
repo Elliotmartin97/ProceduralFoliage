@@ -40,12 +40,8 @@ bool ModelExporter::Export(std::string name, std::vector<Model*> model_list, XMM
 	//Create MTL'S
 	for (int i = 0; i < model_list.size(); i++)
 	{
-
-		if (GenerateMTL(model_list[i]->GetTextureName()))
-		{
-			file << "mtllib " << model_list[i]->GetTextureName() << ".mtl" << std::endl;
-		}
-		
+		GenerateMTL(model_list[i]->GetTextureName());
+		file << "mtllib " << model_list[i]->GetTextureName() << ".mtl" << std::endl;	
 	}
 
 	file << std::endl << "# Vertices" << std::endl;

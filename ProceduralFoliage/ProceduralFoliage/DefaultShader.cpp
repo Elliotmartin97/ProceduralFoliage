@@ -24,7 +24,7 @@ bool DefaultShader::Init(ID3D11Device* device, HWND hwnd)
 {
 	bool result;
 
-	result = InitializeShader(device, hwnd, L"../Engine/Shaders/Light.vs", L"../Engine/Shaders/Light.ps");
+	result = InitializeShader(device, hwnd, L"../Engine/Shaders/PBRLight.vs", L"../Engine/Shaders/PBRLight.ps");
 	if (!result)
 	{
 		return false;
@@ -38,12 +38,12 @@ void DefaultShader::Shutdown()
 }
 
 bool DefaultShader::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor,
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* metallic, ID3D11ShaderResourceView* roughness, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor,
 	XMFLOAT4 diffuseColor, float blend)
 {
 	bool result;
 
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection, ambientColor, diffuseColor, blend);
+	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, metallic, roughness, lightDirection, ambientColor, diffuseColor, blend);
 	if (!result)
 	{
 		return false;
@@ -321,7 +321,7 @@ void DefaultShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd
 }
 
 bool DefaultShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor,
+	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* metallic, ID3D11ShaderResourceView* roughness, XMFLOAT3 lightDirection, XMFLOAT4 ambientColor,
 	XMFLOAT4 diffuseColor, float blend)
 {
 	HRESULT result;
@@ -362,6 +362,8 @@ bool DefaultShader::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMA
 
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(0, 1, &texture);
+	deviceContext->PSSetShaderResources(1, 1, &metallic);
+	deviceContext->PSSetShaderResources(2, 1, &roughness);
 
 	result = deviceContext->Map(m_transparentBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))

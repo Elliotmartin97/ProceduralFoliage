@@ -57,7 +57,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 					branch_rotation.x = -branch_rotation.x;
 				}
 				current_model = new Model;
-				current_model->Init(device, device_context, (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/Green.tga");
+				current_model->Init(device, device_context, (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga");
 				counter++;
 			}
 				break;
@@ -176,7 +176,8 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				if (L_system->ShowLeaves())
 				{
 					Model* leave_model = new Model;
-					leave_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Green.tga");
+					leave_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga");
+					leave_model->SetBlendAmount(1.0f);
 					leave_model->SetPosition(pos.x, pos.y, pos.z);
 					leave_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
 					leave_model->SetScale(scale.y * leaf_multi.x, scale.y * leaf_multi.y, 1.0f);
@@ -196,10 +197,10 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 		}
 		previous_list = current_list;
 		render_list.insert(render_list.end(), current_list.begin(), current_list.end());
-		render_list.insert(render_list.end(), leaves_list.begin(), leaves_list.end());
 		current_list.clear();
 		selected = 0;
 	}
+	render_list.insert(render_list.end(), leaves_list.begin(), leaves_list.end());
 	previous_list.clear();
 	int z = counter;
 	if (L_system->ShowAxiom() != true)

@@ -126,23 +126,48 @@ bool Graphics::Render()
 	cam_rot = XMMatrixRotationY(ang);
 	cam_trans = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 	
-
+	std::vector<Model*> transparent_list;
 
 	XMMATRIX move_mat, rot_mat, scale_mat;
 
 	for (int i = 0; i < turtle->GetModelList().size(); i++)
 	{
+		
 		Model* model = turtle->GetModelList()[i];
+
+		if (model->GetBlendAmount() != 0.0f)
+		{
+			//transparent objects need to render after opaque
+			transparent_list.push_back(model);
+		}
+		else
+		{
+			model->Render(m_Direct3D->GetDeviceContext());
+
+			world_matrix = model->GetTransform() * cam_trans * cam_rot;
+
+			m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
+				model->GetTexture(), model->GetMetallic(), model->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
+
+			m_Direct3D->GetWorldMatrix(world_matrix);
+		}
+	}
+
+	for (int i = 0; i < transparent_list.size(); i++)
+	{
+		Model* model = transparent_list[i];
 
 		model->Render(m_Direct3D->GetDeviceContext());
 
 		world_matrix = model->GetTransform() * cam_trans * cam_rot;
 
+		m_Direct3D->TurnOnAlphaBlending();
 		m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
-			model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
+			model->GetTexture(), model->GetMetallic(), model->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
 
 		m_Direct3D->GetWorldMatrix(world_matrix);
 	}
+	m_Direct3D->TurnOffAlphaBlending();
 	TwDraw();
 	m_Direct3D->EndScene();
 

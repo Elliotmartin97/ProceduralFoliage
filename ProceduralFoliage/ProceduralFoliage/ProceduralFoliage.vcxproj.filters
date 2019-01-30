@@ -121,9 +121,18 @@
     <None Include="..\Engine\Shaders\Light.vs">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="..\Engine\Shaders\PBRLight.ps">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="..\Engine\Shaders\PBRLight.vs">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Engine\Textures\Green.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Engine\Textures\Fern.tga">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>

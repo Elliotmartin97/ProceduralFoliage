@@ -5,6 +5,8 @@ Model::Model()
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
 	m_Texture = 0;
+	m_metallic_texture = 0;
+	m_roughness_texture = 0;
 	texture_file_name = 0;
 	blend_amount = 0.0f;
 }
@@ -12,7 +14,7 @@ Model::~Model()
 {
 }
 
-bool Model::Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* model_filename, char* texture_filename)
+bool Model::Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* model_filename, char* texture_filename, char* metallic_filename, char* roughness_filename)
 {
 	bool result;
 
@@ -30,12 +32,13 @@ bool Model::Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char*
 		return false;
 	}
 
-	// Load the texture for this model.
-	result = LoadTexture(device, deviceContext, texture_filename);
+	// Load the textures for this model.
+	result = LoadTextures(device, deviceContext, texture_filename, metallic_filename, roughness_filename);
 	if (!result)
 	{
 		return false;
 	}
+
 	texture_file_name = texture_filename;
 
 	return true;
@@ -59,6 +62,15 @@ void Model::Render(ID3D11DeviceContext* deviceContext)
 ID3D11ShaderResourceView* Model::GetTexture()
 {
 	return m_Texture->GetTexture();
+}
+
+ID3D11ShaderResourceView* Model::GetMetallic()
+{
+	return m_metallic_texture->GetTexture();
+}
+ID3D11ShaderResourceView* Model::GetRoughness()
+{
+	return m_roughness_texture->GetTexture();
 }
 
 int Model::GetIndexCount()
@@ -190,26 +202,28 @@ void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-bool Model::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool Model::LoadTextures(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* texture_filename, char* mettalic_filename, char* roughness_filename)
 {
 	bool result;
 
-
-	// Create the texture object.
 	m_Texture = new Texture;
-	if (!m_Texture)
-	{
-		return false;
-	}
+	m_metallic_texture = new Texture;
+	m_roughness_texture = new Texture;
 
-	// Initialize the texture object.
-	result = m_Texture->Initialize(device, deviceContext, filename);
+	result = m_Texture->Initialize(device, deviceContext, texture_filename);
 	if (!result)
 	{
 		return false;
 	}
-	texture_file_name = filename;
-	SetTextureName(filename);
+
+	result = m_metallic_texture->Initialize(device, deviceContext, mettalic_filename);
+
+	result = m_roughness_texture->Initialize(device, deviceContext, mettalic_filename);
+
+
+
+	texture_file_name = texture_filename;
+	SetTextureName(texture_filename);
 	return true;
 }
 
@@ -221,6 +235,20 @@ void Model::ReleaseTexture()
 		m_Texture->Shutdown();
 		delete m_Texture;
 		m_Texture = 0;
+	}
+
+	if (m_metallic_texture)
+	{
+		m_metallic_texture->Shutdown();
+		delete m_metallic_texture;
+		m_metallic_texture = 0;
+	}
+
+	if (m_roughness_texture)
+	{
+		m_roughness_texture->Shutdown();
+		delete m_roughness_texture;
+		m_roughness_texture = 0;
 	}
 
 	return;
@@ -281,7 +309,6 @@ bool Model::LoadModel(char* filename)
 
 	// Close the model file.
 	file.close();
-
 	return true;
 }
 
