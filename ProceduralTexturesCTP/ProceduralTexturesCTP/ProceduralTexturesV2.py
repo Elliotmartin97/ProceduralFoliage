@@ -15,8 +15,8 @@ from keras.optimizers import Adam
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 dir_data = "data/texture_data/"
-n_train = 3;
-n_test = 3;
+n_train = 8;
+n_test = 8;
 name_imgs = np.sort(os.listdir(dir_data))
 name_imgs_train = name_imgs[:n_train]
 name_imgs_test = name_imgs[n_train:n_train + n_test]
@@ -38,7 +38,7 @@ x_test = get_npdata(name_imgs_test)
 print("x_test.shape = {}".format(x_test.shape))
 
 fig = plt.figure(figsize=(10,5))
-num_plot = 3
+num_plot = 8
 for i in range(num_plot):
     ax = fig.add_subplot(1,num_plot,i+1)
     ax.imshow(x_train[i])
@@ -148,7 +148,7 @@ valid = discriminator(img)
 combined = models.Model(z, valid)
 combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
-def train(models, x_train, noise_plot, dir_result="/result/", epochs=10000, batch_size=8):
+def train(models, x_train, noise_plot, dir_result="/result/", epochs=10000, batch_size=16):
         '''
         models     : tuple containins three tensors, (combined, discriminator, generator)
         X_train    : np.array containing images (Nsample, height, width, Nchannels)
