@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>a802da79-f5f3-46ed-a0b3-dc8b4a9f70d7</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>ProceduralTexturesCTP.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,8 +24,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ProceduralTexturesCTP.py" />
-    <Compile Include="ProceduralTexturesV2.py">
+    <Compile Include="ProceduralTextures.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
