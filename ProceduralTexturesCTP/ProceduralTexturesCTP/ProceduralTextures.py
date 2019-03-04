@@ -76,7 +76,7 @@ def generator(img_shape, noise_shape = (100,)):
     return(model)
 
 ## Set the dimension of latent variables to be 100
-noise_shape = (40,)
+noise_shape = (100,)
 
 generator = generator(img_shape, noise_shape = noise_shape)
 
