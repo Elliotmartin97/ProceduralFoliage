@@ -19,6 +19,7 @@ public:
 	void SetRotation(float, float, float);
 
 	XMFLOAT3 GetPosition();
+	XMVECTOR GetTransformedVectorPosition();
 	XMFLOAT3 GetRotation();
 
 	void Render();

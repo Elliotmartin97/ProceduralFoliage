@@ -47,7 +47,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	m_Light = new DiffuseLight;
 	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
 	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.5f, -0.5f, 1.0f);
+	m_Light->SetDirection(0.0f, 1.0f, 0.0f);
 
 	TwInit(TW_DIRECT3D11, m_Direct3D->GetDevice());
 	TwWindowSize(screen_width, screen_height);
@@ -128,8 +128,6 @@ bool Graphics::Render()
 	
 	std::vector<Model*> transparent_list;
 
-	XMMATRIX move_mat, rot_mat, scale_mat;
-
 	for (int i = 0; i < turtle->GetModelList().size(); i++)
 	{
 		
@@ -143,8 +141,8 @@ bool Graphics::Render()
 		else
 		{
 			model->Render(m_Direct3D->GetDeviceContext());
-
-			world_matrix = model->GetTransform() * cam_trans * cam_rot;
+			//we dont need to times the world matrix by the gameobject transform because its using transformed vertices in the buffer
+			world_matrix = cam_trans * cam_rot;
 
 			m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
 				model->GetTexture(), model->GetMetallic(), model->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
@@ -152,7 +150,7 @@ bool Graphics::Render()
 			m_Direct3D->GetWorldMatrix(world_matrix);
 		}
 	}
-
+	
 	for (int i = 0; i < transparent_list.size(); i++)
 	{
 		Model* model = transparent_list[i];

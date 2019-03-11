@@ -7,6 +7,18 @@ struct ModelType
 	float nx, ny, nz;
 };
 
+enum CubePoint
+{
+	TOPRIGHTFRONT,
+	TOPRIGHTBACK,
+	TOPLEFTFRONT,
+	TOPLEFTBACK,
+	BOTRIGHTFRONT,
+	BOTRIGHTBACK,
+	BOTLEFTFRONT,
+	BOTLEFTBACK
+};
+
 #ifndef _MODELCLASS_H_
 #define _MODELCLASS_H_
 
@@ -50,6 +62,16 @@ public:
 	ID3D11ShaderResourceView* GetMetallic();
 	ID3D11ShaderResourceView* GetRoughness();
 	ModelType* GetModelType();
+	std::vector<XMFLOAT3> GetTransformedVertexData();
+	void TransformVertexData();
+	void SetTransformedVertexData(std::vector<XMFLOAT3> new_data);
+	std::vector<int> GetBotIndexes() { return bot_indexes; };
+	std::vector<int> GetTopIndexes() { return top_indexes; };
+	XMFLOAT3 GetPointPosition(CubePoint point);
+	void LinkBotPosition(Model* model, int index);
+	int GetBotCount() { return bot_indexes.size(); };
+
+	void SetBufferToTransformedVertices(ID3D11Device* device);
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
@@ -63,8 +85,10 @@ private:
 	void ReleaseModel();
 
 private:
+	VertexType* vertices;
 	ID3D11Device* m_device;
 	ModelType* m_model;
+	std::vector<XMFLOAT3> transformed_vertex_data;
 	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	Texture* m_Texture;
@@ -73,6 +97,8 @@ private:
 	Texture* m_metallic_texture;
 	Texture* m_roughness_texture;
 	float blend_amount;
+	std::vector<int> top_indexes;
+	std::vector<int> bot_indexes;
 };
 
 #endif

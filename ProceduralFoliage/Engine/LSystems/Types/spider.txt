@@ -5,11 +5,11 @@ spider
 1
 0
 0
-+[
++&[
 A
-+LRFXYZF[^]BC
++LRFXYZF&[^]BC
 B
-+LRFXYZF[^BC]+LRFXYZF[^BC
++LRFXYZF&[^BC]+LRFXYZF&[^BC
 C
 @
 1

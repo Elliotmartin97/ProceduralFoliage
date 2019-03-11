@@ -7,15 +7,15 @@ LSystem::LSystem()
 	//Structure rules
 
 	rules[0].a = 'A';
-	rules[0].b = "+LRFXYZF[^]BC";
+	rules[0].b = "+LRFXYZF&[^]BC";
 
 	rules[1].a = 'B';
-	rules[1].b = "+LRFXYZF[^BC]+LRFXYZF[^BC";
+	rules[1].b = "+LRFXYZF&[^BC]+LRFXYZF&[^BC";
 
 	rules[2].a = 'C';
 	rules[2].b = "@";
 
-	axiom = "+[AAAAAAA";
+	axiom = "+&[AAAAAAA";
 	iterations = 6;
 }
 
@@ -60,11 +60,11 @@ LSystem::LSystem(std::string file_name)
 		file >> rules[i].b;
 	}
 
-	rules[1].b = "+LRFXYZF[^BC";
+	rules[1].b = "+LRFXYZF&[^BC";
 	file >> split_count;
 	for (int i = 0; i < split_count; i++)
 	{
-		rules[1].b += "]+LRFXYZF[^BC";
+		rules[1].b += "]+LRFXYZF&[^BC";
 	}
 
 	file >> scale.x >> scale.y >> scale.z;
@@ -139,7 +139,7 @@ void LSystem::SaveType(std::string name)
 	file << fixed_branches << std::endl;
 	file << leaves << std::endl;
 	file << show_axiom << std::endl;
-	axiom = "+[";
+	axiom = "+&[";
 	file << axiom << std::endl;
 
 	rules.resize(rule_size);

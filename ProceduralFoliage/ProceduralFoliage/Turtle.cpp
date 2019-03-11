@@ -175,13 +175,41 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 			case '^':
 				if (L_system->ShowLeaves())
 				{
-					Model* leave_model = new Model;
-					leave_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga");
-					leave_model->SetBlendAmount(1.0f);
-					leave_model->SetPosition(pos.x, pos.y, pos.z);
-					leave_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
-					leave_model->SetScale(scale.y * leaf_multi.x, scale.y * leaf_multi.y, 1.0f);
-					leaves_list.push_back(leave_model);
+					Model* leaf_model = new Model;
+					leaf_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga");
+					leaf_model->SetBlendAmount(1.0f);
+					leaf_model->SetPosition(pos.x, pos.y, pos.z);
+					leaf_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
+					leaf_model->SetScale(scale.y * -leaf_multi.x, scale.y * leaf_multi.y, 1.0f);
+					leaf_model->TransformVertexData();
+					//leaf_model->SetBufferToTransformedVertices(device);
+					leaves_list.push_back(leaf_model);
+				}
+				break;
+			case '&':
+				//fuse the ends of two models together
+				if (previous_model && current_model)
+				{
+					if (L_system->ShowAxiom() == false)
+					{
+						if (previous_model == render_list[0])
+						{
+							current_model->TransformVertexData();
+							current_model->SetBufferToTransformedVertices(device);
+							break;
+						}
+					}
+					current_model->TransformVertexData();
+					for (int i = 0; i < current_model->GetVertexCount(); i++)
+					{
+						current_model->LinkBotPosition(previous_model, i);
+					}
+					current_model->SetBufferToTransformedVertices(device);
+				}
+				else //set the transformed data and break
+				{
+					current_model->TransformVertexData();
+					current_model->SetBufferToTransformedVertices(device);
 				}
 				break;
 			}

@@ -57,18 +57,14 @@ bool ModelExporter::Export(std::string name, std::vector<Model*> model_list, XMM
 			return false;
 		}
 
-		//transform the vertex data by world matrix before exporting
+		//Models have transformed vertex data to export
 		for (int v = 0; v < vert_count; v++)
 		{
-			FXMVECTOR temp_vec = XMVectorSet(model_list[i]->GetModelType()[v].x, model_list[i]->GetModelType()[v].y, model_list[i]->GetModelType()[v].z, 1.0f);
-			XMVECTOR transformed_vec = XMVector3Transform(temp_vec, model_list[i]->GetTransform());
-			XMFLOAT3* new_vertices = new XMFLOAT3;
-			XMStoreFloat3(new_vertices, transformed_vec);
 
 			file << "v" << " " <<
-				new_vertices->x << " " <<
-				new_vertices->y << " " <<
-				new_vertices->z << " " <<
+				model_list[i]->GetTransformedVertexData()[v].x << " " <<
+				model_list[i]->GetTransformedVertexData()[v].y << " " <<
+				model_list[i]->GetTransformedVertexData()[v].z << " " <<
 				std::endl;
 
 		}

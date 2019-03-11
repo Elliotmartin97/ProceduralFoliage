@@ -4,12 +4,12 @@ fern
 10
 1
 1
-0
-+[
+1
++&[
 A
-+LRFXYZF[^]BC
++LRFXYZF&[^]BC
 B
-+LRFXYZF[^BC
++LRFXYZF&[^BC
 C
 @
 0

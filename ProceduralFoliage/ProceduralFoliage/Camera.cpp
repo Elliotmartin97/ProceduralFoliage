@@ -36,6 +36,14 @@ XMFLOAT3 Camera::GetPosition()
 	return XMFLOAT3(m_position_x, m_position_y, m_position_z);
 }
 
+XMVECTOR Camera::GetTransformedVectorPosition()
+{
+	XMFLOAT3 float_pos = XMFLOAT3(m_position_x, m_position_y, m_position_z);
+	XMVECTOR pos = XMLoadFloat3(&float_pos);
+
+	return pos;
+}
+
 XMFLOAT3 Camera::GetRotation()
 {
 	return XMFLOAT3(m_rotation_x, m_rotation_y, m_rotation_z);

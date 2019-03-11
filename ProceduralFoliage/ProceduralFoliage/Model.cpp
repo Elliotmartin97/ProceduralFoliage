@@ -85,7 +85,6 @@ int Model::GetVertexCount()
 
 bool Model::InitializeBuffers(ID3D11Device* device)
 {
-	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
@@ -110,6 +109,15 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	for (int i = 0; i < m_vertexCount; i++)
 	{
 		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
+		transformed_vertex_data.push_back(XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z));
+		if (m_model[i].y == 1)
+		{
+			top_indexes.push_back(i);
+		}
+		else
+		{
+			bot_indexes.push_back(i);
+		}
 		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv);
 		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
 
@@ -157,8 +165,6 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	}
 	m_device = device;
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
-	delete[] vertices;
-	vertices = 0;
 
 	delete[] indices;
 	indices = 0;
@@ -314,6 +320,11 @@ bool Model::LoadModel(char* filename)
 
 void Model::ReleaseModel()
 {
+	if (vertices)
+	{
+		delete[] vertices;
+		vertices = nullptr;
+	}
 	if (m_model)
 	{
 		delete[] m_model;
@@ -324,6 +335,133 @@ void Model::ReleaseModel()
 ModelType* Model::GetModelType()
 {
 	return m_model;
+}
+
+std::vector<XMFLOAT3> Model::GetTransformedVertexData()
+{
+	return transformed_vertex_data;
+}
+
+void Model::TransformVertexData()
+{
+	for (int v = 0; v < m_vertexCount; v++)
+	{
+		FXMVECTOR temp_vec = XMVectorSet(GetModelType()[v].x, GetModelType()[v].y, GetModelType()[v].z, 1.0f);
+		XMVECTOR transformed_vec = XMVector3Transform(temp_vec, GetTransform());
+		XMFLOAT3* new_vertices = new XMFLOAT3;
+		XMStoreFloat3(new_vertices, transformed_vec);
+
+		transformed_vertex_data[v].x = new_vertices->x;
+		transformed_vertex_data[v].y = new_vertices->y;
+		transformed_vertex_data[v].z = new_vertices->z;
+	}
+}
+
+void Model::SetTransformedVertexData(std::vector<XMFLOAT3> new_data)
+{
+	transformed_vertex_data = new_data;
+}
+
+XMFLOAT3 Model::GetPointPosition(CubePoint point)
+{
+	XMFLOAT3 position;
+	switch (point)
+	{
+	case CubePoint::TOPRIGHTFRONT:
+		position = transformed_vertex_data[0];
+		break;
+	case CubePoint::TOPRIGHTBACK:
+		position = transformed_vertex_data[13];
+		break;
+	case CubePoint::TOPLEFTFRONT:
+		position = transformed_vertex_data[1];
+		break;
+	case CubePoint::TOPLEFTBACK:
+		position = transformed_vertex_data[7];
+		break;
+	case CubePoint::BOTRIGHTFRONT:
+		position = transformed_vertex_data[2];
+		break;
+	case CubePoint::BOTRIGHTBACK:
+		position = transformed_vertex_data[17];
+		break;
+	case CubePoint::BOTLEFTFRONT:
+		position = transformed_vertex_data[5];
+		break;
+	case CubePoint::BOTLEFTBACK:
+		position = transformed_vertex_data[11];
+		break;
+
+	}
+	return position;
+}
+
+void Model::LinkBotPosition(Model* model, int index)
+{
+	switch (index)
+	{
+	
+	case 2:
+	case 3:
+	case 23:
+	case 30:
+		transformed_vertex_data[index] = model->GetPointPosition(CubePoint::TOPRIGHTFRONT);
+		break;
+	case 17:
+	case 20:
+	case 21:
+	case 32:
+	case 33:
+		transformed_vertex_data[index] = model->GetPointPosition(CubePoint::TOPRIGHTBACK);
+		break;
+	case 5:
+	case 8:
+	case 9:
+	case 31:
+	case 34:
+		transformed_vertex_data[index] = model->GetPointPosition(CubePoint::TOPLEFTFRONT);
+		break;
+	case 11:
+	case 14:
+	case 15:
+	case 35:
+		transformed_vertex_data[index] = model->GetPointPosition(CubePoint::TOPLEFTBACK);
+		break;
+	}
+}
+
+void Model::SetBufferToTransformedVertices(ID3D11Device* device)
+{
+	VertexType* transformed_vertices;
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData;
+
+	transformed_vertices = new VertexType[m_vertexCount];
+
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		transformed_vertices[i].position.x = transformed_vertex_data[i].x;
+		transformed_vertices[i].position.y = transformed_vertex_data[i].y;
+		transformed_vertices[i].position.z = transformed_vertex_data[i].z;
+
+	}
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = transformed_vertices;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	// Now create the vertex buffer.
+    device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+
+	m_device = device;
 }
 
 char* Model::GetTextureFileName()
