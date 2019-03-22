@@ -176,7 +176,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				if (L_system->ShowLeaves())
 				{
 					Model* leaf_model = new Model;
-					leaf_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga", (char*)"../Engine/Textures/Fern.tga");
+					leaf_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga");
 					leaf_model->SetBlendAmount(1.0f);
 					leaf_model->SetPosition(pos.x, pos.y, pos.z);
 					leaf_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);

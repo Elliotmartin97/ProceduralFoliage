@@ -108,7 +108,7 @@ bool Graphics::Frame()
 bool Graphics::Render()
 {
 
-	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	m_Direct3D->BeginScene(0.3f, 0.3f, 0.3f, 1.0f);
 
 	m_camera->Render();
 

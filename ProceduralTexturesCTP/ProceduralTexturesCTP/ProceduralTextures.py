@@ -18,7 +18,7 @@ from keras.backend import resize_images
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 load_models = False
-dir_data = "data/texture_data/"
+dir_data = "data/tree_branch/"
 n_train = 40;
 n_test = 4;
 name_imgs = np.sort(os.listdir(dir_data))
@@ -46,7 +46,6 @@ num_plot = 4
 for i in range(num_plot):
     ax = fig.add_subplot(1,num_plot,i+1)
     ax.imshow(x_train[i])
-
 plt.show()
 
 optimizer_g = Adam(0.00004, 0.5)
@@ -264,9 +263,6 @@ def train(models, x_train, noise_plot, dir_result="/result/", epochs=10000, batc
                 plot_generated_images(noise_plot,
                                       path_save=dir_result+"/image_{:05.0f}.png".format(epoch),
                                       titleadd="Epoch {}".format(epoch))
-            if epoch % 10000 == 0:
-                plot_generated_images(noise_plot,
-                                      titleadd="Epoch {}".format(epoch))
                         
         return(history)
 
@@ -281,26 +277,26 @@ start_time = time.time()
 
 _models = combined, discriminator, generator          
 
-history = train(_models, x_train, noise, dir_result=dir_result,epochs=10000, batch_size=4)
+history = train(_models, x_train, noise, dir_result=dir_result,epochs=50000, batch_size=4)
 end_time = time.time()
 
 ##save Discriminator
 model_d = _models[1]
 model_json = model_d.to_json()
-with open("./models/ferns/model_d.json", "w") as json_file:
+with open("./models/tree_branch/model_d.json", "w") as json_file:
     json_file.write(model_json)
 
-model_d.save_weights("./models/ferns/model_d.h5")
+model_d.save_weights("./models/tree_branch/model_d.h5")
 print("Saved Discriminator")
 
 ##Save Generator
 
 model_g = _models[2]
 model_json = model_g.to_json()
-with open("./models/ferns/model_g.json", "w") as json_file:
+with open("./models/tree_branch/model_g.json", "w") as json_file:
     json_file.write(model_json)
 
-model_g.save_weights("./models/ferns/model_g.h5")
+model_g.save_weights("./models/tree_branch/model_g.h5")
 print("Saved Generator")
 
 print("-"*10)
