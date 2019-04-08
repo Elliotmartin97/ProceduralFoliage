@@ -313,17 +313,14 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 		return false;
 	}
 
-	// Create the rasterizer state from the description we just filled out.
 	result = m_device->CreateRasterizerState(&rasterDesc, &m_raster_state);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
-	// Now set the rasterizer state.
 	device_context->RSSetState(m_raster_state);
 	
-	// Setup the viewport for rendering.
 	viewport.Width = (float)screenWidth;
 	viewport.Height = (float)screenHeight;
 	viewport.MinDepth = 0.0f;
@@ -331,19 +328,15 @@ bool Direct3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bo
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
 
-	// Create the viewport.
 	device_context->RSSetViewports(1, &viewport);
 	
-		// Setup the projection matrix.
-		fieldOfView = 3.141592654f / 4.0f;
+	fieldOfView = 3.141592654f / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	// Create the projection matrix for 3D rendering.
 	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 	
-	// Initialize the world matrix to the identity matrix.
 	m_worldMatrix = XMMatrixIdentity();
-	// Create an orthographic projection matrix for 2D rendering.
+
 	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
@@ -425,7 +418,6 @@ void Direct3D::BeginScene(float red, float green, float blue, float alpha)
 {
 	float color[4];
 
-
 	// Setup the color to clear the buffer to.
 	color[0] = red;
 	color[1] = green;
@@ -466,6 +458,11 @@ ID3D11Device* Direct3D::GetDevice()
 ID3D11DeviceContext* Direct3D::GetDeviceContext()
 {
 	return device_context;
+}
+
+ID3D11DepthStencilView * Direct3D::GetDepthStencilView()
+{
+	return m_depth_stencil_view;
 }
 
 void Direct3D::GetProjectionMatrix(XMMATRIX& projectionMatrix)
@@ -527,4 +524,9 @@ void Direct3D::TurnOffAlphaBlending()
 	device_context->OMSetBlendState(m_alphaDisableBlendingState, blendFactor, 0xffffffff);
 
 	return;
+}
+
+void Direct3D::SetBackBufferTarget()
+{
+	device_context->OMSetRenderTargets(1, &m_render_target_view, m_depth_stencil_view);
 }

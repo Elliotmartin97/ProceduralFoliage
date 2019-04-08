@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib.gridspec as gridspec
 import os, time
+import PIL as pillow;
 
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -14,14 +15,17 @@ from keras.optimizers import Adam
 from keras.models import model_from_json
 from keras.engine.saving import load_model
 from keras.backend import resize_images
+from tensorflow._api.v1 import image
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
-load_models = False
-dir_data = "data/tree_branch/"
+save_models = False
+load_models = True
+transparency = False
+dir_data = "tree_branch"
 n_train = 40;
 n_test = 4;
-name_imgs = np.sort(os.listdir(dir_data))
+name_imgs = np.sort(os.listdir("data/" + dir_data + "/"))
 name_imgs_train = name_imgs[:n_train]
 name_imgs_test = name_imgs[n_train:n_train + n_test]
 img_shape = (64, 64, 3)
@@ -29,7 +33,7 @@ img_shape = (64, 64, 3)
 def get_npdata(name_imgs_train):
     x_train = []
     for i, id in enumerate(name_imgs_train):
-        image = load_img(dir_data + "/" + id, target_size=img_shape[:2])
+        image = load_img("data/" + dir_data + "/" + id, target_size=img_shape[:2])
         image = img_to_array(image) / 255.0
         x_train.append(image)
     x_train = np.array(x_train)
@@ -41,16 +45,10 @@ print("x_train.shape = {}".format(x_train.shape))
 x_test = get_npdata(name_imgs_test)
 print("x_test.shape = {}".format(x_test.shape))
 
-fig = plt.figure(figsize=(10,5))
-num_plot = 4
-for i in range(num_plot):
-    ax = fig.add_subplot(1,num_plot,i+1)
-    ax.imshow(x_train[i])
-plt.show()
-
-optimizer_g = Adam(0.00004, 0.5)
+optimizer_g = Adam(0.00007, 0.5)
 optimizer_d = Adam(0.00007, 0.5)
 
+##batch normalisation increases the speed of training
 def conv_transpose_batch_leaky(layer, filter, kernel, strides, train, alpha):
     x = layers.Conv2DTranspose(filters=filter, kernel_size=kernel ,  strides=strides , use_bias=False)(layer)
     x = layers.BatchNormalization()(x, training=train)
@@ -58,10 +56,7 @@ def conv_transpose_batch_leaky(layer, filter, kernel, strides, train, alpha):
     return x
 
 def generator(img_shape, noise_shape = (100,), train= False):
-    '''
-    noise_shape : the dimension of the input vector for the generator
-    img_shape   : the dimension of the output
-    '''
+    
     ##alpha
     alpha = 0.1
 
@@ -91,16 +86,15 @@ def generator(img_shape, noise_shape = (100,), train= False):
     model.summary() 
     return(model)
 
-## Set the dimension of latent variables to be 100
 noise_shape = (100,)
 
 ##load existing model or generate a new one
 if load_models == True:
 
-    with open("./models/ferns/model_g.json", "r") as json_file:
+    with open("./models/" + dir_data + "/model_g.json", "r") as json_file:
         generator = model_from_json(json_file.read())
 
-    generator.load_weights("./models/ferns/model_g.h5")
+    generator.load_weights("./models/" + dir_data + "/model_g.h5")
 else:
     generator = generator(img_shape, noise_shape = noise_shape)
     
@@ -110,7 +104,7 @@ def get_noise(nsample=1, nlatent_dim=100):
     noise = np.random.normal(0, 1, (nsample,nlatent_dim))
     return(noise)
 
-def plot_generated_images(noise,path_save=None,titleadd=""):
+def plot_images(noise,path_save=None,titleadd=""):
     imgs = generator.predict(noise)
     fig = plt.figure(figsize=(10,5))
     for i, img in enumerate(imgs):
@@ -161,10 +155,10 @@ def build_discriminator(img_shape,noutput=1):
 ##generate or load model
 if load_models == True:
 
-    with open("./models/ferns/model_d.json", "r") as json_file:
+    with open("./models/" + dir_data + "/model_d.json", "r") as json_file:
         discriminator = model_from_json(json_file.read())
 
-    discriminator.load_weights("./models/ferns/model_d.h5")
+    discriminator.load_weights("./models/" + dir_data + "/model_d.h5")
 else:
     discriminator = build_discriminator(img_shape)
 
@@ -238,33 +232,60 @@ def train(models, x_train, noise_plot, dir_result="/result/", epochs=10000, batc
             # The generator wants the discriminator to label the generated samples
             # as valid (ones)
             valid_y = (np.array([1] * batch_size)).reshape(batch_size,1)
-            
-            # Train the generator
-            if train_switch == False:
-                g_loss = combined.train_on_batch(noise, valid_y)
+
+            g_loss = combined.train_on_batch(noise, valid_y)
 
             history.append({"D":d_loss[0],"G":g_loss})
             
             g_loss_f = g_loss
             d_loss_f = d_loss[0]
 
-            if g_loss_f < d_loss_f:
-                train_switch = True
-                print("Training Only Discriminator")
-            else:
-                train_switch = False
-                print("Training Discriminator and Generator")
-
             if epoch % 100 == 0:
                 # Plot the progress
                 print ("Epoch {:05.0f} [D loss: {:4.3f}, acc.: {:05.1f}%] [G loss: {:4.3f}]".format(
                     epoch, d_loss[0], 100*d_loss[1], g_loss))
             if epoch % int(epochs/100) == 0:
-                plot_generated_images(noise_plot,
+                plot_images(noise_plot,
                                       path_save=dir_result+"/image_{:05.0f}.png".format(epoch),
                                       titleadd="Epoch {}".format(epoch))
                         
         return(history)
+    ##generate a new image, then write as png, then use pillow to convert to tga ready to use as a texture for DirectX
+def generate_new(noise):
+    sess = tf.Session()
+    img = generator.predict(noise, True)
+    img = img * 255
+    img_rand = img[0]
+    img_rand = np.squeeze(img_rand)
+    img_rand = tf.convert_to_tensor(img_rand, np.uint8)
+    image_file = image.encode_png(img_rand)
+    if(transparency == True):
+        file_name = tf.constant("./export/leaf.png")
+        file = tf.write_file(file_name,image_file)
+        sess.run(file)
+        im = pillow.Image.open("./export/leaf.png")
+       ## im = im.resize((640,640), pillow.Image.NEAREST)
+        im = im.convert("RGBA")
+        datas = im.getdata()
+        newData = []
+        for item in datas:
+             if item[0] >= 200 and item[1] >= 200 and item[2] >= 200:
+                newData.append((0, 0, 0, 0))
+             else:
+                newData.append(item)
+
+        im.putdata(newData)
+        im.save("C:/Users/Ellio/source/repos/ProceduralFoliage/ProceduralFoliage/Engine/Textures/leaf.tga")
+    else:
+        file_name = tf.constant("./export/branch.png")
+        file = tf.write_file(file_name,image_file)
+        sess.run(file)
+        im = pillow.Image.open("./export/branch.png")
+        im = im.convert("RGBA")
+        ##im = im.resize((640,640), pillow.Image.NEAREST)
+        im.save("C:/Users/Ellio/source/repos/ProceduralFoliage/ProceduralFoliage/Engine/Textures/branch.tga")
+
+    print("Image Saved")
 
 dir_result="./result_GAN/"
 
@@ -273,31 +294,27 @@ try:
 except:
     pass
     
-start_time = time.time()
-
 _models = combined, discriminator, generator          
 
-history = train(_models, x_train, noise, dir_result=dir_result,epochs=50000, batch_size=4)
-end_time = time.time()
+##history = train(_models, x_train, noise, dir_result=dir_result,epochs=1700, batch_size=8)
+generate_new(noise)
 
-##save Discriminator
-model_d = _models[1]
-model_json = model_d.to_json()
-with open("./models/tree_branch/model_d.json", "w") as json_file:
-    json_file.write(model_json)
+if(save_models == True):
 
-model_d.save_weights("./models/tree_branch/model_d.h5")
-print("Saved Discriminator")
+    ## save discriminator model
+    model_d = _models[1]
+    model_json = model_d.to_json()
+    with open("./models/" + dir_data + "/model_d.json", "w") as json_file:
+        json_file.write(model_json)
 
-##Save Generator
+    model_d.save_weights("./models/" + dir_data + "/model_d.h5")
+    print("Saved Discriminator")
 
-model_g = _models[2]
-model_json = model_g.to_json()
-with open("./models/tree_branch/model_g.json", "w") as json_file:
-    json_file.write(model_json)
+    ##save generator model
+    model_g = _models[2]
+    model_json = model_g.to_json()
+    with open("./models/" + dir_data + "/model_g.json", "w") as json_file:
+        json_file.write(model_json)
 
-model_g.save_weights("./models/tree_branch/model_g.h5")
-print("Saved Generator")
-
-print("-"*10)
-print("Time took: {:4.2f} min".format((end_time - start_time)/60))
+    model_g.save_weights("./models/" + dir_data + "/model_g.h5")
+    print("Saved Generator")

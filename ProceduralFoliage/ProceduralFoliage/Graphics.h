@@ -14,6 +14,7 @@
 #include "Turtle.h"
 #include "LSystem.h"
 #include "ModelExporter.h"
+#include "LOD.h"
 
 //global values
 const bool FULL_SCREEN = false;
@@ -34,6 +35,10 @@ public:
 	void Refresh();
 	void ExportModel();
 	bool Frame();
+	void ShowLOD();
+
+	void RenderLOD(float x, float y, float z);
+	void RenderScene(float x, float y, float z);
 	bool Render();
 private:
 
@@ -46,6 +51,8 @@ private:
 	std::string load_file_name;
 	ModelExporter* exporter;
 	XMMATRIX world_matrix, view_matrix, projection_matrix;
+	LOD* lod;
+	bool render_lods = false;
 };
 
 #endif

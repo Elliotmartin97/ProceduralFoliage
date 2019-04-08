@@ -70,7 +70,9 @@ public:
 	XMFLOAT3 GetPointPosition(CubePoint point);
 	void LinkBotPosition(Model* model, int index);
 	int GetBotCount() { return bot_indexes.size(); };
-
+	XMFLOAT3 GetMinBounds() { return bounds[0]; };
+	XMFLOAT3 GetMaxBounds() { return bounds[1]; };
+	void SetBounds();
 	void SetBufferToTransformedVertices(ID3D11Device* device);
 
 private:
@@ -99,6 +101,7 @@ private:
 	float blend_amount;
 	std::vector<int> top_indexes;
 	std::vector<int> bot_indexes;
+	XMFLOAT3 bounds[2];
 };
 
 #endif

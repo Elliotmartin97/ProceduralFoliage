@@ -69,6 +69,9 @@
     <ClCompile Include="ModelExporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LOD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="System.h">
@@ -113,6 +116,9 @@
     <ClInclude Include="ModelExporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LOD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Engine\Shaders\Light.ps">
@@ -133,6 +139,9 @@
       <Filter>Resource Files\Textures</Filter>
     </Image>
     <Image Include="..\Engine\Textures\Fern.tga">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\Engine\Textures\Alpha.tga">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>

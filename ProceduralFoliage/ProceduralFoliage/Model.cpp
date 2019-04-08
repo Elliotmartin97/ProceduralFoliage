@@ -308,9 +308,6 @@ bool Model::LoadModel(char* filename)
 		file >> m_model[i].x >> m_model[i].y >> m_model[i].z;
 		file >> m_model[i].tu >> m_model[i].tv;
 		file >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
-
-		//flip texture y because it reads upside down
-		m_model[i].tv = 1 - m_model[i].tv;
 	}
 
 	// Close the model file.
@@ -360,6 +357,22 @@ void Model::TransformVertexData()
 void Model::SetTransformedVertexData(std::vector<XMFLOAT3> new_data)
 {
 	transformed_vertex_data = new_data;
+	SetBounds();
+}
+
+void Model::SetBounds()
+{
+	for (int i = 0; i < transformed_vertex_data.size(); i++)
+	{
+		//min
+		if (transformed_vertex_data[i].x < bounds[0].x) bounds[0].x = transformed_vertex_data[i].x;
+		if (transformed_vertex_data[i].y < bounds[0].y) bounds[0].y = transformed_vertex_data[i].y;
+		if (transformed_vertex_data[i].z < bounds[0].z) bounds[0].z = transformed_vertex_data[i].z;
+		//max
+		if (transformed_vertex_data[i].x > bounds[1].x) bounds[1].x = transformed_vertex_data[i].x;
+		if (transformed_vertex_data[i].y > bounds[1].y) bounds[1].y = transformed_vertex_data[i].y;
+		if (transformed_vertex_data[i].z > bounds[1].z) bounds[1].z = transformed_vertex_data[i].z;
+	}
 }
 
 XMFLOAT3 Model::GetPointPosition(CubePoint point)

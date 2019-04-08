@@ -57,7 +57,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 					branch_rotation.x = -branch_rotation.x;
 				}
 				current_model = new Model;
-				current_model->Init(device, device_context, (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga");
+				current_model->Init(device, device_context, (char*)"../Engine/Models/Cube.txt", (char*)"../Engine/Textures/branch.tga", (char*)"../Engine/Textures/branch.tga", (char*)"../Engine/Textures/branch.tga");
 				counter++;
 			}
 				break;
@@ -176,7 +176,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				if (L_system->ShowLeaves())
 				{
 					Model* leaf_model = new Model;
-					leaf_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga", (char*)"../Engine/Textures/Green.tga");
+					leaf_model->Init(device, device_context, (char*)"../Engine/Models/Quad.txt", (char*)"../Engine/Textures/leaf.tga", (char*)"../Engine/Textures/leaf.tga", (char*)"../Engine/Textures/leaf.tga");
 					leaf_model->SetBlendAmount(1.0f);
 					leaf_model->SetPosition(pos.x, pos.y, pos.z);
 					leaf_model->SetRotation(rot.x, rot.y, rot.z, 1.0f);
@@ -195,7 +195,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 						if (previous_model == render_list[0])
 						{
 							current_model->TransformVertexData();
-							current_model->SetBufferToTransformedVertices(device);
+							//current_model->SetBufferToTransformedVertices(device);
 							break;
 						}
 					}
@@ -204,12 +204,12 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 					{
 						current_model->LinkBotPosition(previous_model, i);
 					}
-					current_model->SetBufferToTransformedVertices(device);
+					//current_model->SetBufferToTransformedVertices(device);
 				}
 				else //set the transformed data and break
 				{
 					current_model->TransformVertexData();
-					current_model->SetBufferToTransformedVertices(device);
+					//current_model->SetBufferToTransformedVertices(device);
 				}
 				break;
 			}

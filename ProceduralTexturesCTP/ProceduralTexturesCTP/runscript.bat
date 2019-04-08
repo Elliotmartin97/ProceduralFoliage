@@ -1,0 +1,1 @@
+"C:\Users\Ellio\Anaconda3\envs\generate\python.exe" "C:\Users\Ellio\source\repos\ProceduralFoliage\ProceduralTexturesCTP\ProceduralTexturesCTP\ProceduralTextures.py"

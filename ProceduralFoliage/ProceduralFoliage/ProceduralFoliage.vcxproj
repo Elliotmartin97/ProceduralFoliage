@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LOD.cpp" />
     <ClCompile Include="ModelExporter.cpp" />
     <ClCompile Include="Turtle.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -158,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AntTweakBar.h" />
+    <ClInclude Include="LOD.h" />
     <ClInclude Include="ModelExporter.h" />
     <ClInclude Include="Turtle.h" />
     <ClInclude Include="Camera.h" />
@@ -179,6 +181,7 @@
     <None Include="..\Engine\Shaders\PBRLight.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\Engine\Textures\Alpha.tga" />
     <Image Include="..\Engine\Textures\Fern.tga" />
     <Image Include="..\Engine\Textures\Green.tga" />
   </ItemGroup>
