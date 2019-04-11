@@ -16,7 +16,7 @@ LOD::~LOD()
 
 void LOD::Init(ID3D11Device * device, ID3D11DeviceContext* device_context, int textureWidth, int textureHeight)
 {
-	quads.resize(3);
+	quads.resize(2);
 	for (int i = 0; i < quads.size(); i++)
 	{
 		quads[i] = new Model;

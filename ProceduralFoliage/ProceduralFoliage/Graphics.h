@@ -34,7 +34,7 @@ public:
 	void LoadTypeFile(std::string file_name);
 	void Refresh();
 	void ExportModel();
-	bool Frame();
+	bool Update();
 	void ShowLOD();
 
 	void RenderLOD(float x, float y, float z);
@@ -42,11 +42,11 @@ public:
 	bool Render();
 private:
 
-	Direct3D* m_Direct3D;
-	Camera* m_camera;
+	Direct3D* direct3D;
+	Camera* camera;
 	Turtle* turtle;
-	DefaultShader* m_default_shader;
-	DiffuseLight* m_Light;
+	DefaultShader* default_shader;
+	DiffuseLight* light;
 	TwBar* loader_bar;
 	std::string load_file_name;
 	ModelExporter* exporter;

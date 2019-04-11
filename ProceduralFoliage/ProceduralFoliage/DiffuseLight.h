@@ -20,8 +20,8 @@ public:
 	XMFLOAT3 GetDirection();
 
 private:
-	XMFLOAT4 m_ambientColor;
-	XMFLOAT4 m_diffuseColor;
+	XMFLOAT4 ambient_col;
+	XMFLOAT4 diffuse_col;
 	XMFLOAT3 m_direction;
 };
 

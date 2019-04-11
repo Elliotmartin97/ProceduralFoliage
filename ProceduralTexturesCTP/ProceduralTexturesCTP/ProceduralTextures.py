@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib.gridspec as gridspec
 import os, time
-import PIL as pillow;
+import PIL as pillow
+import sys as sys
 
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
@@ -21,8 +22,9 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 save_models = False
 load_models = True
-transparency = False
-dir_data = "tree_branch"
+transparency = True
+dir_data = "leaves"
+
 n_train = 40;
 n_test = 4;
 name_imgs = np.sort(os.listdir("data/" + dir_data + "/"))
@@ -287,21 +289,8 @@ def generate_new(noise):
 
     print("Image Saved")
 
-dir_result="./result_GAN/"
-
-try:
-    os.mkdir(dir_result)
-except:
-    pass
-    
-_models = combined, discriminator, generator          
-
-##history = train(_models, x_train, noise, dir_result=dir_result,epochs=1700, batch_size=8)
-generate_new(noise)
-
-if(save_models == True):
-
-    ## save discriminator model
+def save_model():
+     ## save discriminator model
     model_d = _models[1]
     model_json = model_d.to_json()
     with open("./models/" + dir_data + "/model_d.json", "w") as json_file:
@@ -318,3 +307,18 @@ if(save_models == True):
 
     model_g.save_weights("./models/" + dir_data + "/model_g.h5")
     print("Saved Generator")
+
+dir_result="./result_GAN/"
+
+try:
+    os.mkdir(dir_result)
+except:
+    pass
+    
+_models = combined, discriminator, generator          
+
+if(save_models):
+    history = train(_models, x_train, noise, dir_result=dir_result,epochs=2000, batch_size=8)
+    save_model()
+else:
+    generate_new(noise)

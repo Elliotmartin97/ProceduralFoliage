@@ -68,7 +68,6 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 					//only for starting branches
 					if (rot.x == 0.0f)
 					{
-
 						range = (rotation_range.x * ((float)rand() / (float)RAND_MAX));
 
 						if (branch_rotation.x > 0.0f)
@@ -79,7 +78,6 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 						{
 							rot.x = branch_rotation.x + range;
 						}
-
 					}
 					else
 					{
@@ -101,20 +99,18 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				
 				break;
 			case 'Y':
-				if (fixed_branches)
-				{
-
-				}
-				else
+				//Rotate the model of the Y Axis of its transform
+				if (!fixed_branches)
 				{
 					range = (rotation_range.y * ((float)rand() / (float)RAND_MAX));
 					rot.y = branch_rotation.y + range;
 				}
 				break;
 			case 'Z':
+				//rotate the model of the Z axis of its transform
 				if (fixed_branches)
 				{
-					//only for starting branches
+					//only use random values for starting branches, the rest are in fixed positions
 					if (rot.z == 0.0f)
 					{
 						float range = (rotation_range.z * ((float)rand() / (float)RAND_MAX));
@@ -128,14 +124,17 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 				}
 				break;
 			case 'F':
+				//move the model forward on its transform
 				current_model->MoveUp(1.1f);
 				XMStoreFloat3(&pos,current_model->GetPosition());
 				break;
 			case '[':
+				//add the current model to the overall list before creating a new one
 				current_list.push_back(current_model);
 				current_model = nullptr;
 				break;
 			case ']':
+				//get the previous model to gain access to its data such as position, rotation and scale
 				previous_model = previous_list[selected];
 				XMStoreFloat3(&pos, previous_model->GetPosition());
 				XMStoreFloat4(&rot, previous_model->GetRotation());
@@ -195,7 +194,7 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 						if (previous_model == render_list[0])
 						{
 							current_model->TransformVertexData();
-							//current_model->SetBufferToTransformedVertices(device);
+							current_model->SetBufferToTransformedVertices(device);
 							break;
 						}
 					}
@@ -204,12 +203,12 @@ void Turtle::Generate(ID3D11Device* device, ID3D11DeviceContext* device_context,
 					{
 						current_model->LinkBotPosition(previous_model, i);
 					}
-					//current_model->SetBufferToTransformedVertices(device);
+					current_model->SetBufferToTransformedVertices(device);
 				}
 				else //set the transformed data and break
 				{
 					current_model->TransformVertexData();
-					//current_model->SetBufferToTransformedVertices(device);
+					current_model->SetBufferToTransformedVertices(device);
 				}
 				break;
 			}

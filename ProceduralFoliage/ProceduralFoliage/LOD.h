@@ -17,8 +17,6 @@ public:
 	void SetLODBounds(std::vector<Model*> models);
 private:
 	std::vector<Model*> quads;
-	Model* quad_1 = nullptr;
-	Model* quad_2 = nullptr;
 
 	ID3D11Texture2D* renderTargetTextureMap;
 	ID3D11RenderTargetView* renderTargetViewMap;

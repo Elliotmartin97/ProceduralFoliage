@@ -2,11 +2,11 @@
 
 Model::Model()
 {
-	m_vertexBuffer = 0;
-	m_indexBuffer = 0;
-	m_Texture = 0;
-	m_metallic_texture = 0;
-	m_roughness_texture = 0;
+	vertex_buffer = 0;
+	index_buffer = 0;
+	texture = 0;
+	metallic_texture = 0;
+	roughness_texture = 0;
 	texture_file_name = 0;
 	blend_amount = 0.0f;
 }
@@ -61,26 +61,26 @@ void Model::Render(ID3D11DeviceContext* deviceContext)
 
 ID3D11ShaderResourceView* Model::GetTexture()
 {
-	return m_Texture->GetTexture();
+	return texture->GetTexture();
 }
 
 ID3D11ShaderResourceView* Model::GetMetallic()
 {
-	return m_metallic_texture->GetTexture();
+	return metallic_texture->GetTexture();
 }
 ID3D11ShaderResourceView* Model::GetRoughness()
 {
-	return m_roughness_texture->GetTexture();
+	return roughness_texture->GetTexture();
 }
 
 int Model::GetIndexCount()
 {
-	return m_indexCount;
+	return index_count;
 }
 
 int Model::GetVertexCount()
 {
-	return m_vertexCount;
+	return vertex_count;
 }
 
 bool Model::InitializeBuffers(ID3D11Device* device)
@@ -92,25 +92,25 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 
 
 	// Create the vertex array.
-	vertices = new VertexType[m_vertexCount];
+	vertices = new VertexType[vertex_count];
 	if (!vertices)
 	{
 		return false;
 	}
 
 	// Create the index array.
-	indices = new unsigned long[m_indexCount];
+	indices = new unsigned long[index_count];
 	if (!indices)
 	{
 		return false;
 	}
 
 	// Load the vertex array and index array with data.
-	for (int i = 0; i < m_vertexCount; i++)
+	for (int i = 0; i < vertex_count; i++)
 	{
-		vertices[i].position = XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z);
-		transformed_vertex_data.push_back(XMFLOAT3(m_model[i].x, m_model[i].y, m_model[i].z));
-		if (m_model[i].y == 1)
+		vertices[i].position = XMFLOAT3(model[i].x, model[i].y, model[i].z);
+		transformed_vertex_data.push_back(XMFLOAT3(model[i].x, model[i].y, model[i].z));
+		if (model[i].y == 1)
 		{
 			top_indexes.push_back(i);
 		}
@@ -118,15 +118,15 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 		{
 			bot_indexes.push_back(i);
 		}
-		vertices[i].texture = XMFLOAT2(m_model[i].tu, m_model[i].tv);
-		vertices[i].normal = XMFLOAT3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+		vertices[i].texture = XMFLOAT2(model[i].tu, model[i].tv);
+		vertices[i].normal = XMFLOAT3(model[i].nx, model[i].ny, model[i].nz);
 
 		indices[i] = i;
 	}
 
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * vertex_count;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -138,7 +138,7 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	vertexData.SysMemSlicePitch = 0;
 
 	// Now create the vertex buffer.
-	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertex_buffer);
 	if (FAILED(result))
 	{
 		return false;
@@ -146,7 +146,7 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 
 	// Set up the description of the static index buffer.
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
+	indexBufferDesc.ByteWidth = sizeof(unsigned long) * index_count;
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
@@ -158,12 +158,12 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 	indexData.SysMemSlicePitch = 0;
 
 	// Create the index buffer.
-	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
+	result = device->CreateBuffer(&indexBufferDesc, &indexData, &index_buffer);
 	if (FAILED(result))
 	{
 		return false;
 	}
-	m_device = device;
+	device = device;
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
 
 	delete[] indices;
@@ -175,17 +175,17 @@ bool Model::InitializeBuffers(ID3D11Device* device)
 void Model::ShutdownBuffers()
 {
 	// Release the index buffer.
-	if (m_indexBuffer)
+	if (index_buffer)
 	{
-		m_indexBuffer->Release();
-		m_indexBuffer = 0;
+		index_buffer->Release();
+		index_buffer = 0;
 	}
 
 	// Release the vertex buffer.
-	if (m_vertexBuffer)
+	if (vertex_buffer)
 	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = 0;
+		vertex_buffer->Release();
+		vertex_buffer = 0;
 	}
 }
 
@@ -199,10 +199,10 @@ void Model::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	offset = 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	deviceContext->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
 
 	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -212,19 +212,19 @@ bool Model::LoadTextures(ID3D11Device* device, ID3D11DeviceContext* deviceContex
 {
 	bool result;
 
-	m_Texture = new Texture;
-	m_metallic_texture = new Texture;
-	m_roughness_texture = new Texture;
+	texture = new Texture;
+	metallic_texture = new Texture;
+	roughness_texture = new Texture;
 
-	result = m_Texture->Initialize(device, deviceContext, texture_filename);
+	result = texture->Initialize(device, deviceContext, texture_filename);
 	if (!result)
 	{
 		return false;
 	}
 
-	result = m_metallic_texture->Initialize(device, deviceContext, mettalic_filename);
+	result = metallic_texture->Initialize(device, deviceContext, mettalic_filename);
 
-	result = m_roughness_texture->Initialize(device, deviceContext, mettalic_filename);
+	result = roughness_texture->Initialize(device, deviceContext, mettalic_filename);
 
 
 
@@ -236,25 +236,25 @@ bool Model::LoadTextures(ID3D11Device* device, ID3D11DeviceContext* deviceContex
 void Model::ReleaseTexture()
 {
 	// Release the texture object.
-	if (m_Texture)
+	if (texture)
 	{
-		m_Texture->Shutdown();
-		delete m_Texture;
-		m_Texture = 0;
+		texture->Shutdown();
+		delete texture;
+		texture = 0;
 	}
 
-	if (m_metallic_texture)
+	if (metallic_texture)
 	{
-		m_metallic_texture->Shutdown();
-		delete m_metallic_texture;
-		m_metallic_texture = 0;
+		metallic_texture->Shutdown();
+		delete metallic_texture;
+		metallic_texture = 0;
 	}
 
-	if (m_roughness_texture)
+	if (roughness_texture)
 	{
-		m_roughness_texture->Shutdown();
-		delete m_roughness_texture;
-		m_roughness_texture = 0;
+		roughness_texture->Shutdown();
+		delete roughness_texture;
+		roughness_texture = 0;
 	}
 
 	return;
@@ -283,14 +283,14 @@ bool Model::LoadModel(char* filename)
 	}
 
 	// Read in the vertex count.
-	file >> m_vertexCount;
+	file >> vertex_count;
 
 	// Set the number of indices to be the same as the vertex count.
-	m_indexCount = m_vertexCount;
+	index_count = vertex_count;
 
 	// Create the model using the vertex count that was read in.
-	m_model = new ModelType[m_vertexCount];
-	if (!m_model)
+	model = new ModelType[vertex_count];
+	if (!model)
 	{
 		return false;
 	}
@@ -303,11 +303,11 @@ bool Model::LoadModel(char* filename)
 	}
 
 	// Read in the vertex data.
-	for (int i = 0; i < m_vertexCount; i++)
+	for (int i = 0; i < vertex_count; i++)
 	{
-		file >> m_model[i].x >> m_model[i].y >> m_model[i].z;
-		file >> m_model[i].tu >> m_model[i].tv;
-		file >> m_model[i].nx >> m_model[i].ny >> m_model[i].nz;
+		file >> model[i].x >> model[i].y >> model[i].z;
+		file >> model[i].tu >> model[i].tv;
+		file >> model[i].nx >> model[i].ny >> model[i].nz;
 	}
 
 	// Close the model file.
@@ -322,16 +322,16 @@ void Model::ReleaseModel()
 		delete[] vertices;
 		vertices = nullptr;
 	}
-	if (m_model)
+	if (model)
 	{
-		delete[] m_model;
-		m_model = 0;
+		delete[] model;
+		model = 0;
 	}
 }
 
 ModelType* Model::GetModelType()
 {
-	return m_model;
+	return model;
 }
 
 std::vector<XMFLOAT3> Model::GetTransformedVertexData()
@@ -341,7 +341,7 @@ std::vector<XMFLOAT3> Model::GetTransformedVertexData()
 
 void Model::TransformVertexData()
 {
-	for (int v = 0; v < m_vertexCount; v++)
+	for (int v = 0; v < vertex_count; v++)
 	{
 		FXMVECTOR temp_vec = XMVectorSet(GetModelType()[v].x, GetModelType()[v].y, GetModelType()[v].z, 1.0f);
 		XMVECTOR transformed_vec = XMVector3Transform(temp_vec, GetTransform());
@@ -449,9 +449,9 @@ void Model::SetBufferToTransformedVertices(ID3D11Device* device)
 	D3D11_BUFFER_DESC vertexBufferDesc;
 	D3D11_SUBRESOURCE_DATA vertexData;
 
-	transformed_vertices = new VertexType[m_vertexCount];
+	transformed_vertices = new VertexType[vertex_count];
 
-	for (int i = 0; i < m_vertexCount; i++)
+	for (int i = 0; i < vertex_count; i++)
 	{
 		transformed_vertices[i].position.x = transformed_vertex_data[i].x;
 		transformed_vertices[i].position.y = transformed_vertex_data[i].y;
@@ -460,7 +460,7 @@ void Model::SetBufferToTransformedVertices(ID3D11Device* device)
 	}
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
+	vertexBufferDesc.ByteWidth = sizeof(VertexType) * vertex_count;
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -472,9 +472,9 @@ void Model::SetBufferToTransformedVertices(ID3D11Device* device)
 	vertexData.SysMemSlicePitch = 0;
 
 	// Now create the vertex buffer.
-    device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
+    device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertex_buffer);
 
-	m_device = device;
+	device = device;
 }
 
 char* Model::GetTextureFileName()

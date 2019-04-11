@@ -36,30 +36,26 @@ void TW_CALL LODCall(void *client_data)
 
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
-	bool result;
 
+	//Direct3D object.
+	direct3D = new Direct3D;
+	direct3D->Init(screen_width, screen_height, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 
-	// Initialize the Direct3D object.
-	m_Direct3D = new Direct3D;
-	m_Direct3D->Init(screen_width, screen_height, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	camera = new Camera;
+	camera->SetPosition(0.0f, 3.0f, -10.0f);
 
-	//Initialize the Camera object.
-	m_camera = new Camera;
-	m_camera->SetPosition(0.0f, 3.0f, -10.0f);
+	default_shader = new DefaultShader;
+	default_shader->Init(direct3D->GetDevice(), hwnd);
 
-	//Initialize the Shaders
-	m_default_shader = new DefaultShader;
-	m_default_shader->Init(m_Direct3D->GetDevice(), hwnd);
+	light = new DiffuseLight;
+	light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
+	light->SetDiffuseColor(0.8f, 0.8f, 0.8f, 1.0f);
+	light->SetDirection(0.0f, 1.0f, 0.0f);
 
-	//Initialize the Diffuse Lights
-	m_Light = new DiffuseLight;
-	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
-	m_Light->SetDiffuseColor(0.8f, 0.8f, 0.8f, 1.0f);
-	m_Light->SetDirection(0.0f, -1.0f, 0.0f);
-
-	TwInit(TW_DIRECT3D11, m_Direct3D->GetDevice());
+	TwInit(TW_DIRECT3D11, direct3D->GetDevice());
 	TwWindowSize(screen_width, screen_height);
 
+	//anttweak bar used for the scene, includes options to load and export files, and show the LOD of models
 	loader_bar = TwNewBar("Load File");
 
 	TwCopyStdStringToClientFunc(CopyStdStringToClient);
@@ -72,18 +68,17 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 	TwAddSeparator(loader_bar, "", NULL);
 	TwAddButton(loader_bar, "LOD", LODCall, this, " label='SHOW LOD ");
 
-
-
+	//where the magic happens, the turtle creates the LSystem and the model
 	turtle = new Turtle;
-	turtle->Generate(m_Direct3D->GetDevice(),m_Direct3D->GetDeviceContext(), "fern");
+	turtle->Generate(direct3D->GetDevice(),direct3D->GetDeviceContext(), "fern");
 
 	exporter = new ModelExporter;
 
 	lod = new LOD;
-	lod->Init(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), screen_width, screen_height);
+	lod->Init(direct3D->GetDevice(), direct3D->GetDeviceContext(), screen_width, screen_height);
 	lod->SetQuadPosition(0,3,0);
 	lod->SetQuadScale(4, 4, 0);
-	//system("C:/users/Ellio/source/repos/ProceduralFoliage/ProceduralTexturesCTP/ProceduralTexturesCTP/runscript.bat");
+
 	//system("C:/users/Ellio/source/repos/ProceduralFoliage/ProceduralTexturesCTP/ProceduralTexturesCTP/runscript.bat");
 	return true;
 }
@@ -97,7 +92,7 @@ void Graphics::LoadTypeFile(std::string file_name)
 	}
 
 	turtle = new Turtle;
-	turtle->Generate(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), file_name);
+	turtle->Generate(direct3D->GetDevice(), direct3D->GetDeviceContext(), file_name);
 }
 
 void Graphics::Refresh()
@@ -115,7 +110,7 @@ void Graphics::ExportModel()
 	exporter->Export(turtle->GetName(), turtle->GetModelList(), world_matrix);
 }
 
-bool Graphics::Frame()
+bool Graphics::Update()
 {
 	Render();
 	return true;
@@ -128,21 +123,21 @@ void Graphics::ShowLOD()
 
 void Graphics::RenderLOD(float x, float y, float z)
 {
-	lod->SetRenderTarget(m_Direct3D->GetDeviceContext(), m_Direct3D->GetDepthStencilView());
+	lod->SetRenderTarget(direct3D->GetDeviceContext(), direct3D->GetDepthStencilView());
 
-	lod->ClearRenderTarget(m_Direct3D->GetDeviceContext(), m_Direct3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 0.0f);
+	lod->ClearRenderTarget(direct3D->GetDeviceContext(), direct3D->GetDepthStencilView(), 0.0f, 0.0f, 0.0f, 0.0f);
 
 	RenderScene(x, y, z);
 
-	m_Direct3D->SetBackBufferTarget();
+	direct3D->SetBackBufferTarget();
 }
 
 void Graphics::RenderScene(float x, float y, float z)
 {
-	m_camera->Render();
+	camera->Render();
 
-	m_camera->GetViewMatrix(view_matrix);
-	m_Direct3D->GetProjectionMatrix(projection_matrix);
+	camera->GetViewMatrix(view_matrix);
+	direct3D->GetProjectionMatrix(projection_matrix);
 	static float ang = 0;
 	if(render_lods == false)
 	{
@@ -172,13 +167,13 @@ void Graphics::RenderScene(float x, float y, float z)
 		}
 		else
 		{
-			model->Render(m_Direct3D->GetDeviceContext());
-			world_matrix = model->GetTransform() * cam_trans * cam_rot;
+			model->Render(direct3D->GetDeviceContext());
+			world_matrix = cam_trans * cam_rot;
 
-			m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
-				model->GetTexture(), model->GetMetallic(), model->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
+			default_shader->Render(direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
+				model->GetTexture(), model->GetMetallic(), model->GetRoughness(), light->GetDirection(), light->GetAmbientColor(), light->GetDiffuseColor(), model->GetBlendAmount());
 
-			m_Direct3D->GetWorldMatrix(world_matrix);
+			direct3D->GetWorldMatrix(world_matrix);
 		}
 	}
 
@@ -186,17 +181,17 @@ void Graphics::RenderScene(float x, float y, float z)
 	{
 		Model* model = transparent_list[i];
 
-		model->Render(m_Direct3D->GetDeviceContext());
+		model->Render(direct3D->GetDeviceContext());
 		world_matrix = model->GetTransform() * cam_trans * cam_rot;
 
-		m_Direct3D->TurnOnAlphaBlending();
-		m_default_shader->Render(m_Direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
-			model->GetTexture(), model->GetMetallic(), model->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), model->GetBlendAmount());
+		direct3D->TurnOnAlphaBlending();
+		default_shader->Render(direct3D->GetDeviceContext(), model->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
+			model->GetTexture(), model->GetMetallic(), model->GetRoughness(), light->GetDirection(), light->GetAmbientColor(), light->GetDiffuseColor(), model->GetBlendAmount());
 
-		m_Direct3D->GetWorldMatrix(world_matrix);
+		direct3D->GetWorldMatrix(world_matrix);
 	}
 	
-	m_Direct3D->TurnOffAlphaBlending();
+	direct3D->TurnOffAlphaBlending();
 }
 
 bool Graphics::Render()
@@ -213,9 +208,7 @@ bool Graphics::Render()
 		XMMATRIX cam_rot;
 		cam_rot = XMMatrixRotationY(ang);
 		std::vector<Model*> lod_models = lod->GetModel();
-
-		
-		m_Direct3D->BeginScene(0.3f, 0.3f, 0.3f, 1.0f);
+		direct3D->StartScene(0.3f, 0.3f, 0.3f, 1.0f);
 
 		for (int i = 0; i < lod_models.size(); i++)
 		{
@@ -223,39 +216,36 @@ bool Graphics::Render()
 			{
 				//render normally
 				RenderLOD(0, 0, 0);
+				lod_models[0]->SetPosition(0, 5, 0);
 			}
 			if (i == 1)
 			{
 				//render again at 90 degree angle
 				RenderLOD(0,90,0);
-				lod_models[1]->SetRotation(0, 0, 0, 1);
+				lod_models[1]->SetRotation(0, 1.5f, 0, 1);
+				lod_models[1]->SetPosition(0, 5, 0);
 			}
-			if (i == 2)
-			{
-				//render again from above
-				RenderLOD(0,0,90);
-
-			}
-
-			lod_models[i]->Render(m_Direct3D->GetDeviceContext());
+			
+			lod_models[i]->Render(direct3D->GetDeviceContext());
 
 			world_matrix = lod_models[i]->GetTransform() * cam_rot;
 
-			m_Direct3D->TurnOnAlphaBlending();
-			m_default_shader->Render(m_Direct3D->GetDeviceContext(), lod_models[i]->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
-				lod->GetShaderResourceView(), lod_models[i]->GetMetallic(), lod_models[i]->GetRoughness(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(), lod_models[i]->GetBlendAmount());
+			direct3D->TurnOnAlphaBlending();
+			default_shader->Render(direct3D->GetDeviceContext(), lod_models[i]->GetIndexCount(), world_matrix, view_matrix, projection_matrix,
+				lod->GetShaderResourceView(), lod_models[i]->GetMetallic(), lod_models[i]->GetRoughness(), light->GetDirection(), light->GetAmbientColor(), light->GetDiffuseColor(), lod_models[i]->GetBlendAmount());
 		}
-		m_Direct3D->TurnOffAlphaBlending();
+
+		direct3D->TurnOffAlphaBlending();
 		
 	}
 	else
 	{
-		m_Direct3D->BeginScene(0.3f, 0.3f, 0.3f, 1.0f);
+		direct3D->StartScene(0.3f, 0.3f, 0.3f, 1.0f);
 		RenderScene(0,0,0);
 	}
 
 	TwDraw();
-	m_Direct3D->EndScene();
+	direct3D->EndScene();
 
 	return true;
 }

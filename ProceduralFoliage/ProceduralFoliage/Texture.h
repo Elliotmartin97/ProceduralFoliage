@@ -27,12 +27,12 @@ public:
 	ID3D11ShaderResourceView* GetTexture();
 
 private:
-	bool LoadTarga(char*, int&, int&);
+	bool LoadTGA(char*, int&, int&);
 
 private:
-	unsigned char* m_targaData;
-	ID3D11Texture2D* m_texture;
-	ID3D11ShaderResourceView* m_textureView;
+	unsigned char* targa_data;
+	ID3D11Texture2D* texture;
+	ID3D11ShaderResourceView* texture_view;
 
 };
 

@@ -15,18 +15,18 @@ public:
 
 	bool Init();
 	void Run();
-	void ShutdownWindows();
+	void Shutdown();
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
 private:
-	bool Frame();
+	bool Update();
 	void InitializeWindows(int&, int&);
 private:
 	LPCWSTR app_name;
 	HINSTANCE h_instance;
 	HWND hwnd;
 
-	std::unique_ptr<Input> input;
+	std::unique_ptr<Input> key_input;
 	std::unique_ptr<Graphics> graphics;
 };
 

@@ -47,7 +47,7 @@ public:
 	Model();
 	~Model();
 
-	bool Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* model_filename, char* texture_filename, char* mettalic_filename, char* roughness_filename);
+	bool Init(ID3D11Device* device, ID3D11DeviceContext* device_context, char* model_filename, char* texture_filename, char* mettalic_filename, char* roughness_filename);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -88,16 +88,16 @@ private:
 
 private:
 	VertexType* vertices;
-	ID3D11Device* m_device;
-	ModelType* m_model;
+	ID3D11Device* device;
+	ModelType* model;
 	std::vector<XMFLOAT3> transformed_vertex_data;
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
-	Texture* m_Texture;
+	ID3D11Buffer *vertex_buffer, *index_buffer;
+	int vertex_count, index_count;
+	Texture* texture;
 	char* texture_file_name;
 	std::string texture_name;
-	Texture* m_metallic_texture;
-	Texture* m_roughness_texture;
+	Texture* metallic_texture;
+	Texture* roughness_texture;
 	float blend_amount;
 	std::vector<int> top_indexes;
 	std::vector<int> bot_indexes;

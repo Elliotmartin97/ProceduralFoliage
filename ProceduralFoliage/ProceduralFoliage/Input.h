@@ -19,7 +19,7 @@ public:
 
 private:
 	
-	std::vector<bool> m_keys;
+	std::vector<bool> keys;
 };
 
 #endif

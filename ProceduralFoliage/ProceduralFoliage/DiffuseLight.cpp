@@ -10,30 +10,27 @@ DiffuseLight::~DiffuseLight()
 
 void DiffuseLight::SetAmbientColor(float red, float green, float blue, float alpha)
 {
-	m_ambientColor = XMFLOAT4(red, green, blue, alpha);
-	return;
+	ambient_col = XMFLOAT4(red, green, blue, alpha);
 }
 
 void DiffuseLight::SetDiffuseColor(float red, float green, float blue, float alpha)
 {
-	m_diffuseColor = XMFLOAT4(red, green, blue, alpha);
-	return;
+	diffuse_col = XMFLOAT4(red, green, blue, alpha);
 }
 
 void DiffuseLight::SetDirection(float x, float y, float z)
 {
 	m_direction = XMFLOAT3(x, y, z);
-	return;
 }
 
 XMFLOAT4 DiffuseLight::GetAmbientColor()
 {
-	return m_ambientColor;
+	return ambient_col;
 }
 
 XMFLOAT4 DiffuseLight::GetDiffuseColor()
 {
-	return m_diffuseColor;
+	return diffuse_col;
 }
 
 XMFLOAT3 DiffuseLight::GetDirection()
